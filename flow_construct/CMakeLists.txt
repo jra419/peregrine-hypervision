@@ -8,3 +8,6 @@ add_library (${PROJECT_NAME} ${DIR_LIB_SRCS})
 target_link_libraries(${PROJECT_NAME}
     pthread
 )
+
+find_path(/opt/scripts json.hpp)
+target_include_directories(${PROJECT_NAME} PRIVATE /opt/scripts)

@@ -6,10 +6,10 @@ using namespace Hypervision;
 
 auto traffic_graph::connected_component() const -> shared_ptr<component> {
     __START_FTIMMER__
-    LOGF("Detect strong connected conponents.");
+    LOGF("Detect strong connected components.");
 
     vector<addr_t> _vertex_reverse;
-    set_union(vertex_set_long.cbegin(), vertex_set_long.cend(), vertex_set_short_reduce.cbegin(), 
+    set_union(vertex_set_long.cbegin(), vertex_set_long.cend(), vertex_set_short_reduce.cbegin(),
                 vertex_set_short_reduce.cend(), back_inserter(_vertex_reverse));
     set<addr_t> _ss(_vertex_reverse.cbegin(), _vertex_reverse.cend());
     _vertex_reverse.clear();
@@ -57,11 +57,11 @@ auto traffic_graph::connected_component() const -> shared_ptr<component> {
 
     vector<vector<size_t> > parts;
     for (const auto & ref : _vertex) {
-        
+
         if (!_mk[ref.second]) {
             decltype(parts)::value_type _part;
 
-            const function<void(const size_t, decltype(_part) &)> _f_dfs = 
+            const function<void(const size_t, decltype(_part) &)> _f_dfs =
             [&] (const size_t _idx, decltype(_part) & _ptr) -> void {
                 _mk[_idx] = true;
                 _ptr.push_back(_idx);
@@ -178,7 +178,7 @@ auto traffic_graph::connected_component() const -> shared_ptr<component> {
 
 #ifdef ADD_GLOBAL_SHORT_CLUSTER
     vector<addr_t> _vertex_glb;
-    set_difference(vertex_set_short.cbegin(), vertex_set_short.cend(), 
+    set_difference(vertex_set_short.cbegin(), vertex_set_short.cend(),
                    vertex_set_short_reduce.cbegin(), vertex_set_short_reduce.cend(),
                    back_inserter(_vertex_glb));
     set<addr_t> _set_glb(_vertex_glb.cbegin(), _vertex_glb.cend());
@@ -203,6 +203,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
     const auto _f_extract_feature_component = [&] (const component::value_type & cp) -> feature_t {
         unordered_set<size_t> _long_index, _short_index, _short_agg_index;
         for (const addr_t addr: cp) {
+            cout << "addr: " << addr << endl;
             if (long_edge_out.count(addr)){
                 const auto & __index_ls = long_edge_out.at(addr);
                 _long_index.insert(cbegin(__index_ls), cend(__index_ls));
@@ -238,6 +239,13 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
             }
             byte_ctr_short += acc * edge_size;
         }
+        cout << "Feat extract components" << endl;
+        cout << cp.size() << endl;
+        cout << _long_index.size() << endl;
+        cout << _short_index.size() << endl;
+        cout << _short_agg_index.size() << endl;
+        cout << byte_ctr_long << endl;
+        cout << byte_ctr_short << "\n" << endl;
         return {
             (double) cp.size(),
             (double) _long_index.size(),
@@ -255,6 +263,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
             for (size_t i = 0; i < x_len; i ++) {
                 for (size_t j = 0; j < y_len; j ++) {
                     mxt(j, i) = mx[i][j];
+                    cout << "mx [" << i << "," << j << "] = " << mx[i][j] << endl;
                 }
             }
             return mxt;
@@ -269,18 +278,20 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
     scale_cp.Fit(cp_f_mat);
     decltype(cp_f_mat) __cp_pre_norm_feature = cp_f_mat;
     scale_cp.Transform(__cp_pre_norm_feature, cp_f_mat);
-    
+
     arma::mat centroids_cp;
     arma::Row<size_t> assignments_cp;
-    
+
     mlpack::dbscan::DBSCAN<> k_cp(uc, vc);
     k_cp.Cluster(cp_f_mat, assignments_cp, centroids_cp);
 
     const auto __get_loss_cp = [&centroids_cp] (const decltype(cp_f_mat.col(0)) & _vec) -> double_t {
         double_t res = HUG;
         mlpack::metric::EuclideanDistance euclidean_eval;
+        cout << "centroids_cp.ncols: " << centroids_cp.n_cols << endl;
         for (size_t i = 0; i < centroids_cp.n_cols; i ++) {
             res = min(res, euclidean_eval.Evaluate(centroids_cp.col(i), _vec) );
+            cout << "res " << i << ": " << res << endl;
         }
         return res;
     };
@@ -289,7 +300,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
     for (size_t i = 0; i < cp_f_mat.n_cols; i ++) {
         loss_vec.push_back({__get_loss_cp(cp_f_mat.col(i)), i});
     }
-    sort(loss_vec.begin(), loss_vec.end(), [&] 
+    sort(loss_vec.begin(), loss_vec.end(), [&]
     (decltype(loss_vec)::value_type & a, decltype(loss_vec)::value_type & b) -> bool { return a.first > b.first; });
 
 #ifdef DISP_SELECTED_COMPONENT_STA

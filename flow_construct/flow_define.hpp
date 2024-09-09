@@ -3,7 +3,7 @@
 #include "../common.hpp"
 #include "../packet_parse/packet_basic.hpp"
 
-namespace Hypervision 
+namespace Hypervision
 {
 
 using flow_time_t = double_t;
@@ -23,7 +23,7 @@ public:
         p_reverse_index = make_shared<vector<size_t> >();
     }
 
-    basic_flow(const decltype(str) str, const decltype(end) end, const decltype(code) code, 
+    basic_flow(const decltype(str) str, const decltype(end) end, const decltype(code) code,
         const decltype(p_packet_p_seq) p_packet_p_seq, const decltype(p_reverse_index) p_reverse_index):
         str(str), end(end), code(code), p_packet_p_seq(p_packet_p_seq), p_reverse_index(p_reverse_index) {}
 
@@ -69,18 +69,18 @@ public:
 
     tuple5_flow4(const tuple5_conn4 & flow_id): flow_id(flow_id) {}
 
-    tuple5_flow4(const tuple5_conn4 & flow_id, 
-                const decltype(str) str, 
+    tuple5_flow4(const tuple5_conn4 & flow_id,
+                const decltype(str) str,
                 const decltype(end) end,
                 const decltype(code) code,
                 const decltype(p_packet_p_seq) p_packet_p_seq,
-                const decltype(p_reverse_index) p_reverse_index): 
+                const decltype(p_reverse_index) p_reverse_index):
                 flow_id(flow_id), basic_flow(str, end, code, p_packet_p_seq, p_reverse_index) {}
 
-    tuple5_flow4(const tuple5_conn4 & flow_id, const decltype(p_packet_p_seq) p_packet_p_seq, 
+    tuple5_flow4(const tuple5_conn4 & flow_id, const decltype(p_packet_p_seq) p_packet_p_seq,
                  const decltype(p_reverse_index) p_reverse_index):
                     flow_id(flow_id), basic_flow(p_packet_p_seq, p_reverse_index) {}
-    
+
     tuple5_flow4(const tuple5_flow4&) = default;
     tuple5_flow4 & operator=(const tuple5_flow4&) = default;
     virtual ~tuple5_flow4() {}
@@ -93,15 +93,15 @@ public:
 
     tuple5_flow6(const tuple5_conn6 & flow_id): flow_id(flow_id) {}
 
-    tuple5_flow6(const tuple5_conn6 & flow_id, 
-                const decltype(str) str, 
+    tuple5_flow6(const tuple5_conn6 & flow_id,
+                const decltype(str) str,
                 const decltype(end) end,
                 const decltype(code) code,
                 const decltype(p_packet_p_seq) p_packet_p_seq,
-                const decltype(p_reverse_index) p_reverse_index): 
+                const decltype(p_reverse_index) p_reverse_index):
                 flow_id(flow_id), basic_flow(str, end, code, p_packet_p_seq, p_reverse_index) {}
-    
-    tuple5_flow6(const tuple5_conn6 & flow_id, const decltype(p_packet_p_seq) p_packet_p_seq, 
+
+    tuple5_flow6(const tuple5_conn6 & flow_id, const decltype(p_packet_p_seq) p_packet_p_seq,
                  const decltype(p_reverse_index) p_reverse_index):
                     flow_id(flow_id), basic_flow(p_packet_p_seq, p_reverse_index) {}
 

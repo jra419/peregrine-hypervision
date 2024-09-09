@@ -73,10 +73,10 @@ public:
     void parse_edge(void) {
         p_short_edge_score = make_shared<score_t>(p_short_edge->size());
         p_long_edge_score = make_shared<score_t>(p_long_edge->size());
-        
+
         std::fill(p_short_edge_score->begin(), p_short_edge_score->end(), 0.0);
         std::fill(p_long_edge_score->begin(), p_long_edge_score->end(), 0.0);
-        
+
         parse_short_edge();
         parse_long_edge();
     }
@@ -109,14 +109,14 @@ private:
     auto _f_exeract_feature_long2(const size_t index) const -> feature_t;
     auto __f_trans_armadillo_mat_T(const vector<feature_t> & mx) -> arma::mat;
 
-    void _acquire_edge_index(const vector<addr_t> & addr_ls, 
+    void _acquire_edge_index(const vector<addr_t> & addr_ls,
                              unordered_set<size_t> & _long_index, unordered_set<size_t> & _short_index);
     auto _pre_process_short(const unordered_set<size_t> & _short_index,
                             arma::mat & dataset_short, arma::mat & centroids_short, arma::Row<size_t> & assignments_short) -> size_t;
     auto _pre_process_long(const unordered_set<size_t> & _long_index,
                            arma::mat & centroids_long, arma::Row<size_t> & assignments_long) -> size_t;
 
-    void _process_short(const unordered_set<size_t> & _short_index, 
+    void _process_short(const unordered_set<size_t> & _short_index,
                         const arma::mat & dataset_short, const arma::mat & centroids_short, const arma::Row<size_t> & assignments_short);
     void _process_long(const unordered_set<size_t> & _long_index,
                        const arma::mat & centroids_long, const arma::Row<size_t> & assignments_long);

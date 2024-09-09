@@ -22,11 +22,11 @@ private:
 
 public:
 
-    long_edge(const decltype(p_flow) p_flow, 
-              const decltype(p_length_distribution) p_length_distribution, 
-              const decltype(p_type_distribution) p_type_distribution, 
+    long_edge(const decltype(p_flow) p_flow,
+              const decltype(p_length_distribution) p_length_distribution,
+              const decltype(p_type_distribution) p_type_distribution,
               const decltype(p_time_distribution) p_time_distribution):
-              p_flow(p_flow), p_length_distribution(p_length_distribution), 
+              p_flow(p_flow), p_length_distribution(p_length_distribution),
               p_type_distribution(p_type_distribution), p_time_distribution(p_time_distribution) {}
 
     virtual ~long_edge () {}
@@ -68,7 +68,7 @@ public:
     inline auto get_time_range(void) const -> pair<flow_time_t, flow_time_t> {
         return {p_flow->get_str_time(), p_flow->get_end_time()};
     }
-    
+
 };
 
 
@@ -161,7 +161,7 @@ public:
 
     auto get_pkt_seq_size(void) const -> size_t {
         return p_flow->at(0)->get_p_packet_p_seq()->size();
-    } 
+    }
 
     auto get_pkt_seq_code(void) const -> pkt_code_t {
         return p_flow->at(0)->get_pkt_code();

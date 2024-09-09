@@ -27,7 +27,7 @@ int main(int argc, char * argv[]) {
     auto hv1 = make_shared<Hypervision::hypervision_detector>();
     hv1->config_via_json(config_j);
     hv1->start();
- 
+
     __STOP_FTIMER__
     __PRINTF_EXE_TIME__
 

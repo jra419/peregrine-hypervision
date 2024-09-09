@@ -4,7 +4,7 @@
 using namespace Hypervision;
 
 
-const auto __get4_tuple = [] (shared_ptr<basic_flow> pf, 
+const auto __get4_tuple = [] (shared_ptr<basic_flow> pf,
     string & saddr, string & daddr, pkt_port_t & sp, pkt_port_t & dp) -> void {
     if (typeid(*pf) == typeid(tuple5_flow4)) {
         const auto p4 = dynamic_pointer_cast<tuple5_flow4>(pf);
@@ -31,7 +31,7 @@ const auto __get4_tuple = [] (shared_ptr<basic_flow> pf,
 
 
 void long_edge::show_edge(void) const {
-    
+
     double_t start_tm = p_flow->get_str_time(), end_tm = p_flow->get_end_time();
     string saddr, daddr;
     pkt_port_t sp, dp;
@@ -48,7 +48,7 @@ void long_edge::show_edge(void) const {
         }
     }
     string type_str = oss.str();
-    
+
     __get4_tuple(p_flow, saddr, daddr, sp, dp);
 
     printf("[%15s:%-6d -> %15s:%-6d] => [%7ld Packets] [%6.3lfs FCT] [%s].\n",
@@ -105,7 +105,7 @@ auto long_edge::get_avg_packet_rate() const -> bool {
 
 
 auto long_edge::is_pulse_flow() const -> bool {
-    if (get_avg_packet_rate() > pulse_flow_time_line || 
+    if (get_avg_packet_rate() > pulse_flow_time_line ||
         p_length_distribution->size() < pulse_flow_ctr_line) {
         return true;
     } else {
@@ -125,8 +125,8 @@ auto long_edge::is_invalid_flow() const -> bool {
         return sum;
     };
 
-    if (_get(TCP_SYN) > invalid_packet_line || 
-        _get(TCP_FIN) > invalid_packet_line || 
+    if (_get(TCP_SYN) > invalid_packet_line ||
+        _get(TCP_FIN) > invalid_packet_line ||
         _get(TCP_RST) > invalid_packet_line) {
             return true;
     }
@@ -136,7 +136,7 @@ auto long_edge::is_invalid_flow() const -> bool {
 
 
 void short_edge::show_edge(size_t max_show) const {
-    
+
     auto __get_agg_str = [] (const agg_code _ac) -> const string {
         ostringstream oss;
         for (size_t i = 0; i < 5; i ++)
@@ -161,7 +161,7 @@ void short_edge::show_edge(size_t max_show) const {
         }
         return oss.str();
     };
-    
+
     string saddr, daddr;
     pkt_port_t sp, dp;
     __get4_tuple(p_flow->at(0), saddr, daddr, sp, dp);
@@ -233,7 +233,7 @@ void short_edge::show_edge(size_t max_show) const {
             printf(" [%s]\n", __get_type_str(p_flow->at(i)).c_str());
             num_len ++;
             if (num_len == max_show) {
-                printf("...... [%6ld lines in total]\n", 
+                printf("...... [%6ld lines in total]\n",
                     max(max(p_ls_saddr->size(), p_ls_daddr->size()), max(ls_sp.size(), ls_dp.size())) );
                 break;
             }

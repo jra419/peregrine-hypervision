@@ -18,3 +18,6 @@ target_link_libraries(${PROJECT_NAME}
 )
 
 target_link_libraries(${PROJECT_NAME} z3)
+
+find_path(/opt/scripts json.hpp)
+target_include_directories(${PROJECT_NAME} PRIVATE /opt/scripts)

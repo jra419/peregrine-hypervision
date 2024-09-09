@@ -16,6 +16,7 @@ private:
     shared_ptr<vector<shared_ptr<basic_packet> > > p_parse_result;
     shared_ptr<vector<shared_ptr<basic_packet> > > p_parse_train, p_parse_test;
     double_t train_ratio = 0.25;
+    uint32_t sampl = 1;
 
     shared_ptr<binary_label_t> p_label;
     double_t attack_time_after = 0.0;
@@ -32,10 +33,10 @@ private:
 public:
     basic_dataset() {}
     basic_dataset(const decltype(p_parse_result) & p_parse_result,
-                  const double_t train_ratio=0.25, const double_t attack_time_after=0.0): 
+                  const double_t train_ratio=0.25, const double_t attack_time_after=0.0):
                   p_parse_result(p_parse_result), train_ratio(train_ratio), attack_time_after(attack_time_after) {}
 
-    void set_attacker_mach_list(const decltype(p_attacker_src4) p_attacker_src4=nullptr, 
+    void set_attacker_mach_list(const decltype(p_attacker_src4) p_attacker_src4=nullptr,
                                 const decltype(p_attacker_src6) p_attacker_src6=nullptr,
                                 const decltype(p_attacker_dst4) p_attacker_dst4=nullptr,
                                 const decltype(p_attacker_dst6) p_attacker_dst6=nullptr,
@@ -49,7 +50,7 @@ public:
         this->p_attacker_srcdst6 = p_attacker_srcdst6;
     }
 
-    void set_attacker_mach_list(const vector<string> & attacker_src4={}, 
+    void set_attacker_mach_list(const vector<string> & attacker_src4={},
                                 const vector<string> & attacker_src6={},
                                 const vector<string> & attacker_dst4={},
                                 const vector<string> & attacker_dst6={},
@@ -84,23 +85,35 @@ public:
         return p_parse_result;
     }
 
-    void import_dataset(void) {
+    // void import_dataset(void) {
+    void import_dataset(uint32_t train) {
         __START_FTIMMER__
         ifstream _ifd(load_data_path);
         vector<string> string_temp;
+        uint32_t count = 0;
         while (true) {
             string _s;
             if (getline(_ifd, _s)) {
-                string_temp.push_back(_s);
+                count++;
+                if (count <= train) {
+                    string_temp.push_back(_s);
+                }
+                else if (count > train && count % sampl == 0) {
+                    string_temp.push_back(_s);
+                } else {
+                    continue;
+                }
             } else {
                 break;
             }
         }
         _ifd.close();
         size_t num_pkt = string_temp.size();
+        LOGF("Num pkts: %lu", num_pkt);
         p_parse_result = make_shared<decltype(p_parse_result)::element_type>(num_pkt);
 
         const size_t multiplex_num = 64;
+        // const size_t multiplex_num = 1;
         const u_int32_t part_size = ceil(((double) num_pkt) / ((double) multiplex_num));
         vector<pair<size_t, size_t> > _assign;
         for (size_t core = 0, idx = 0; core < multiplex_num; ++ core, idx = min(idx + part_size, num_pkt)) {
@@ -136,8 +149,17 @@ public:
         p_label = make_shared<decltype(p_label)::element_type>();
         string ll;
         _ifl >> ll;
+        uint32_t count_label = 0;
         for (const char a: ll) {
-            p_label->push_back(a == '1');
+            count_label++;
+            if (count_label <= train) {
+                p_label->push_back(a == '1');
+            }
+            if (count_label > train && count_label % sampl == 0) {
+                p_label->push_back(a == '1');
+            } else {
+                continue;
+            }
         }
         _ifl.close();
         assert(p_label->size() == p_parse_result->size());

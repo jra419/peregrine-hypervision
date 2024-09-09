@@ -35,11 +35,11 @@ void explicit_flow_constructor::construct_flow(size_t multiplex) {
     }
 
     auto __f = [&] (size_t _from, size_t _to) -> void {
-        
+
         if (_from == _to) {
             return;
         }
-        
+
         flow_H_table_4_t flow_H_table_4;
         flow_H_table_6_t flow_H_table_6;
 
@@ -85,7 +85,7 @@ void explicit_flow_constructor::construct_flow(size_t multiplex) {
                 last_check_time = _timestp;
 
                 unordered_set<flow_hash_4_t, boost::hash<flow_hash_4_t> > evicted_flow4;
-                for_each(begin(flow_H_table_4), end(flow_H_table_4), 
+                for_each(begin(flow_H_table_4), end(flow_H_table_4),
                                 [&] (flow_H_table_4_t::const_reference & ref) -> void {
                     if ((_timestp - ref.second->get_end_time() - FLOW_TIME_OUT) > EPS) {
                         evicted_flow4.insert(ref.first);
@@ -97,7 +97,7 @@ void explicit_flow_constructor::construct_flow(size_t multiplex) {
                 }
 
                 unordered_set<flow_hash_6_t, boost::hash<flow_hash_6_t> > evicted_flow6;
-                for_each(begin(flow_H_table_6), end(flow_H_table_6), 
+                for_each(begin(flow_H_table_6), end(flow_H_table_6),
                                 [&] (flow_H_table_6_t::const_reference & ref) -> void {
                     if ((_timestp - ref.second->get_end_time() - FLOW_TIME_OUT) > EPS) {
                         evicted_flow6.insert(ref.first);
@@ -109,11 +109,11 @@ void explicit_flow_constructor::construct_flow(size_t multiplex) {
                 }
             }
         }
-        for_each(begin(flow_H_table_4), end(flow_H_table_4), 
+        for_each(begin(flow_H_table_4), end(flow_H_table_4),
                         [&] (flow_H_table_4_t::const_reference & ref) -> void {
             flow4_to_add.push_back(ref.second);
         });
-        for_each(begin(flow_H_table_6), end(flow_H_table_6), 
+        for_each(begin(flow_H_table_6), end(flow_H_table_6),
                         [&] (flow_H_table_6_t::const_reference & ref) -> void {
             flow6_to_add.push_back(ref.second);
         });
@@ -307,7 +307,7 @@ void explicit_flow_constructor::flow_double_check(size_t multiplex) {
 
     LOGF("Number of flows: %ld [%ld IPv4 | %ld IPv6].", p_construct_result4->size() + p_construct_result6->size(),
             p_construct_result4->size(), p_construct_result6->size());
-    
+
     __STOP_FTIMER__
     __PRINTF_EXE_TIME__
 }
@@ -325,7 +325,7 @@ void explicit_flow_constructor::dump_flow_statistic(void) const {
         return;
     }
 
-    LOGF("Constructed IPv4 flow: %8ld, IPv6 flow: %8ld", 
+    LOGF("Constructed IPv4 flow: %8ld, IPv6 flow: %8ld",
         p_construct_result4->size(), p_construct_result6->size());
     LOGF("Display parsed flow statistic:");
 
@@ -355,6 +355,11 @@ void explicit_flow_constructor::dump_flow_statistic(void) const {
     for (size_t i = 0; i < stack_type_t::F_UNKNOWN; i ++) {
         printf("[%-8s]: %d\n", stack2name[i], __sat6[i]);
     }
+
+#define FLOW_PACKET_SUM_CHECK
+#define FLOW_TIME_CHECK
+#define FLOW_LENGTH_CHECK
+#define FLOW_BYTE_CHECK
 
 #ifdef FLOW_PACKET_SUM_CHECK
     size_t ipv4_packets = 0;

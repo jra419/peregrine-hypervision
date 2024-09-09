@@ -13,17 +13,17 @@ def analyze_thread_template(task:str) -> None:
     if not os.path.exists(f'./log/{args.group}'):
         os.mkdir(f"./log/{args.group}")
 
-    os.system(f"./basic_analyzer.py -t {task}" + 
+    os.system(f"./basic_analyzer.py -t {task}" +
               f" > ./log/{args.group}/{task}.log")
 
 
 @time_log
-@call_log("Start bacth analyzing.")
+@call_log("Start batch analyzing.")
 def analyze_group() -> None:
     pl = []
     for ts in task_list:
         pl.append(mp.Process(target=analyze_thread_template, args=(ts,)))
-    
+
     [p.start() for p in pl]
     [p.join() for p in pl]
 

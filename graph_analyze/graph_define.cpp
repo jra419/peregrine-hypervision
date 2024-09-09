@@ -5,10 +5,10 @@ using namespace Hypervision;
 
 
 auto traffic_graph::is_huge_short_edge(const addr_t addr) const -> bool {
-    if ((short_edge_in.count(addr) && short_edge_in.at(addr).size() > huge_short_line) || 
+    if ((short_edge_in.count(addr) && short_edge_in.at(addr).size() > huge_short_line) ||
         (short_edge_out.count(addr)  && short_edge_out.at(addr).size() > huge_short_line))
         return true;
-    else 
+    else
         return false;
 }
 
@@ -59,14 +59,13 @@ void traffic_graph::dump_edge_anomly(void) const {
 
 auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label) -> const decltype(p_pkt_score) {
     __START_FTIMMER__
-    
+
     if (p_pkt_score != nullptr) {
         WARN("Previous result overlap.");
     }
 
     p_pkt_score = make_shared<score_t>();
     fill_n(back_inserter(*p_pkt_score), p_label->size(), -1);
-
     for (size_t i = 0; i < p_long_edge->size(); ++ i) {
         const auto ref = p_long_edge->at(i)->get_raw_flow();
         for (const auto index: *ref->get_p_reverse_id()) {
@@ -85,7 +84,7 @@ auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label
                 if (res > p_pkt_score->at(index)) {
                     p_pkt_score->at(index) = res;
                 }
-            } 
+            }
         }
     }
 

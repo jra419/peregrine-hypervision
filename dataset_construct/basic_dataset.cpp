@@ -60,7 +60,7 @@ void basic_dataset::do_dataset_construct(size_t multiplex) {
                         }
                     }
                 }
-                
+
                 if (p_attacker_dst4 != nullptr && test_pkt_type_code(ref.tp, pkt_type_t::IPv4)) {
                     const auto p_packet = dynamic_pointer_cast<basic_packet4>(p_parse_test->at(i));
                     const string _addr = get_str_addr(tuple_get_dst_addr(p_packet->flow_id));
@@ -124,7 +124,7 @@ void basic_dataset::do_dataset_construct(size_t multiplex) {
 
     size_t num_malicious = count(p_label->begin(), p_label->end(), true);
     LOGF("[test  set: %8ld packets]", p_parse_test->size());
-    LOGF("[%8ld benign (%4.2lf%%), %8ld malicious (%4.2lf%%)]", 
+    LOGF("[%8ld benign (%4.2lf%%), %8ld malicious (%4.2lf%%)]",
         p_parse_test->size() - num_malicious,
         100.0 * (p_parse_test->size() - num_malicious) /  p_parse_test->size(),
         num_malicious,
@@ -132,7 +132,7 @@ void basic_dataset::do_dataset_construct(size_t multiplex) {
 
     __STOP_FTIMER__
     __PRINTF_EXE_TIME__
-    
+
 }
 
 
@@ -140,12 +140,16 @@ void basic_dataset::configure_via_json(const json & jin) {
     try {
         if (jin.count("train_ratio")) {
             train_ratio = static_cast<decltype(train_ratio)>(jin["train_ratio"]);
+            LOGF("[Train ratio: %f]", train_ratio);
             if (train_ratio < -EPS) {
                 FATAL_ERROR("Ratio of training data is lower than 0.");
             }
         }
         if (jin.count("attack_time_after")) {
             attack_time_after = static_cast<decltype(attack_time_after)>(jin["attack_time_after"]);
+        }
+        if (jin.count("sampl")) {
+            sampl = static_cast<decltype(sampl)>(jin["sampl"]);
         }
 
         if (jin.count("data_path")) {
@@ -205,6 +209,7 @@ void basic_dataset::configure_via_json(const json & jin) {
             const auto _ls = jin["attacker_srcdst4"];
             for (const auto & _l: _ls) {
                 if (_l.size() != 2) {
+                    LOGF("[l size: %ld]", _l.size());
                     FATAL_ERROR("Wrong configuration format.");
                 }
                 p_attacker_srcdst4->push_back({static_cast<string>(_l[0]), static_cast<string>(_l[1])});
@@ -223,9 +228,9 @@ void basic_dataset::configure_via_json(const json & jin) {
                 p_attacker_srcdst6->push_back({static_cast<string>(_l[0]), static_cast<string>(_l[1])});
             }
         }
-        
+
     } catch(const exception & e) {
         FATAL_ERROR(e.what());
     }
-    
+
 }

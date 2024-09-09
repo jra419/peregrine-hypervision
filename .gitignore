@@ -15,3 +15,8 @@ json.hpp
 *.log
 *.png
 *.pyc
+
+script/
+venv/
+docker/
+result_analyze/eval/

@@ -6,6 +6,8 @@ using namespace Hypervision;
 
 void edge_constructor::flow_classification(raw_flow_vec & short_flow_pvec, raw_flow_vec &  long_flow_pvec) {
     size_t sum_short = 0, sum_long = 0;
+    LOGF("Num pkts parse result (flow classif.): %lu", p_parse_result->size());
+
     for (const auto p_f: * p_parse_result) {
         if (p_f->get_p_reverse_id()->size() > EDGE_LONG_LINE) {
             long_flow_pvec.push_back(p_f);
@@ -111,6 +113,8 @@ void edge_constructor::construct_short_flow(raw_flow_vec & short_flow_pvec) {
     for (const auto p_f: short_flow_pvec) {
         if (typeid(*p_f) == typeid(tuple5_flow4)) {
             const auto p_f4 = dynamic_pointer_cast<tuple5_flow4>(p_f);
+            cout << "ip src: " << tuple_get_src_addr(p_f4->flow_id) << endl;
+            cout << "ip dst: " << tuple_get_dst_addr(p_f4->flow_id) << endl;
             f_src_vec.push_back(tuple_get_src_addr(p_f4->flow_id));
             f_dst_vec.push_back(tuple_get_dst_addr(p_f4->flow_id));
         } else {

@@ -16,7 +16,7 @@ if [ -d "./build" ]; then
     rm -r ./build
 fi
 
-mkdir build && cd $_ && cmake -G Ninja .. && ninja  && cd ..
+mkdir build && cd $_ && bear -- cmake -G Ninja .. && ninja  && cd ..
 if [ $? == 0 ]; then
     echo "Rebuild finished."
 else

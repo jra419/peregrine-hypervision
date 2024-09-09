@@ -15,12 +15,12 @@ private:
 
     json jin_main;
     string file_path = "";
-    
+
     shared_ptr<vector<shared_ptr<basic_packet> > > p_parse_result;
-    
+
     shared_ptr<binary_label_t> p_label;
     shared_ptr<vector<double_t> > p_loss;
-    
+
     shared_ptr<vector<shared_ptr<basic_flow> > > p_flow;
 
     shared_ptr<vector<shared_ptr<short_edge> > > p_short_edges;
@@ -36,7 +36,7 @@ public:
 
         if (jin_main.count("packet_parse") &&
             jin_main["packet_parse"].count("target_file_path")) {
-            
+
             LOGF("Parse packet from file.");
             file_path = jin_main["packet_parse"]["target_file_path"];
             const auto p_packet_parser = make_shared<pcap_parser>(file_path);
@@ -50,40 +50,59 @@ public:
             p_dataset_constructor->do_dataset_construct();
             p_label = p_dataset_constructor->get_label();
 
-        } else if (jin_main["dataset_construct"].count("data_path") && 
+        } else if (jin_main["dataset_construct"].count("data_path") &&
                     jin_main["dataset_construct"].count("label_path")){
             LOGF("Load & split datasets.");
             const auto p_dataset_constructor = make_shared<basic_dataset>(p_parse_result);
             p_dataset_constructor->configure_via_json(jin_main["dataset_construct"]);
-            p_dataset_constructor->import_dataset();
+            auto train = 0;
+            p_dataset_constructor->import_dataset(train);
             p_label = p_dataset_constructor->get_label();
             p_parse_result = p_dataset_constructor->get_raw_pkt();
+            LOGF("Num pkts parse_result: %lu", p_parse_result->size());
         } else {
             LOGF("Dataset not found.");
         }
+
+        // for (const auto& packet_ptr : *p_parse_result) {
+        //     std::cout << "TS: " << std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10) << GET_DOUBLE_TS(packet_ptr->ts) << std::endl;
+        //     if (typeid(packet_ptr) == typeid(basic_packet4)) {
+        //         const auto _p_rep = dynamic_pointer_cast<basic_packet4>(packet_ptr);
+        //         const auto _stack_code = convert_packet2stack_code(_p_rep->tp);
+        //         const auto _flow_id = tuple4_extend(_p_rep->flow_id, _stack_code);
+        //         std::cout << "flow id: " << std::get<0>(_flow_id) << std::endl;
+        //     }
+        // }
 
         LOGF("Construct flow.");
         const auto p_flow_constructor = make_shared<explicit_flow_constructor>(p_parse_result);
         p_flow_constructor->config_via_json(jin_main["flow_construct"]);
         p_flow_constructor->construct_flow();
+        p_flow_constructor->dump_flow_statistic();
         p_flow = p_flow_constructor->get_constructed_raw_flow();
 
         LOGF("Construct edge.");
         const auto p_edge_constructor = make_shared<edge_constructor>(p_flow);
         p_edge_constructor->config_via_json(jin_main["edge_construct"]);
         p_edge_constructor->do_construct();
-        // p_edge_constructor->dump_short_edge();
-        // p_edge_constructor->dump_long_edge();
+        LOGF("Dump short edges.");
+        p_edge_constructor->dump_short_edge();
+        LOGF("Dump long edges.");
+        p_edge_constructor->dump_long_edge();
         tie(p_short_edges, p_long_edges) = p_edge_constructor->get_edge();
 
         LOGF("Construct Graph.");
         const auto p_graph = make_shared<traffic_graph>(p_short_edges, p_long_edges);
+        LOGF("Config via json.");
         p_graph->config_via_json(jin_main["graph_analyze"]);
+        LOGF("Parse Edge.");
         p_graph->parse_edge();
         // p_graph->dump_graph_statistic();
         // p_graph->dump_edge_anomly();
         // p_graph->dump_vertex_anomly();
+        LOGF("Graph Detect.");
         p_graph->graph_detect();
+        LOGF("Get final pkt score.");
         p_loss = p_graph->get_final_pkt_score(p_label);
 
         if (save_result_enable) {
@@ -139,7 +158,7 @@ public:
         } else {
             FATAL_ERROR("File Error.");
         }
-        
+
         __STOP_FTIMER__
         __PRINTF_EXE_TIME__
     }
