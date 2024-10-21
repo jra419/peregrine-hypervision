@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/riprdos.data",
-        "label_path": "../data/riprdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/riprdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/riprdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

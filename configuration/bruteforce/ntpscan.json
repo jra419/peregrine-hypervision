@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ntpscan.data",
-        "label_path": "../data/ntpscan.label",
+        "data_path": "../../datasets/hypervision/data/brute/ntpscan.data",
+        "label_path": "../../datasets/hypervision/data/brute/ntpscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

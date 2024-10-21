@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/sslscan.data",
-        "label_path": "../data/sslscan.label",
+        "data_path": "../../datasets/hypervision/data/web/sslscan.data",
+        "label_path": "../../datasets/hypervision/data/web/sslscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

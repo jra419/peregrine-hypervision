@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/paraminject.data",
-        "label_path": "../data/paraminject.label",
+        "data_path": "../../datasets/hypervision/data/web/paraminject.data",
+        "label_path": "../../datasets/hypervision/data/web/paraminject.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

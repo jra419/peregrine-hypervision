@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/http_lrscan.data",
-        "label_path": "../data/http_lrscan.label",
+        "data_path": "../../datasets/hypervision/data/lrscan/http_lrscan.data",
+        "label_path": "../../datasets/hypervision/data/lrscan/http_lrscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

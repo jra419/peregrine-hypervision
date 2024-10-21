@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/httpscan.data",
-        "label_path": "../data/httpscan.label",
+        "data_path": "../../datasets/hypervision/data/brute/httpscan.data",
+        "label_path": "../../datasets/hypervision/data/brute/httpscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

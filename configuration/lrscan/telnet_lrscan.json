@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/telnet_lrscan.data",
-        "label_path": "../data/telnet_lrscan.label",
+        "data_path": "../../datasets/hypervision/data/lrscan/telnet_lrscan.data",
+        "label_path": "../../datasets/hypervision/data/lrscan/telnet_lrscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

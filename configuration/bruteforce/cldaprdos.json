@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/cldaprdos.data",
-        "label_path": "../data/cldaprdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/cldaprdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/cldaprdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

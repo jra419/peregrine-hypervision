@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ssdprdos.data",
-        "label_path": "../data/ssdprdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/ssdprdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/ssdprdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

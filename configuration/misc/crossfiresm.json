@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/crossfiresm.data",
-        "label_path": "../data/crossfiresm.label",
+        "data_path": "../../datasets/hypervision/data/misc/crossfiresm.data",
+        "label_path": "../../datasets/hypervision/data/misc/crossfiresm.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

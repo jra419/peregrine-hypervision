@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/spam100.data",
-        "label_path": "../data/spam100.label",
+        "data_path": "../../datasets/hypervision/data/misc/spam100.data",
+        "label_path": "../../datasets/hypervision/data/misc/spam100.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/codeinject.data",
-        "label_path": "../data/codeinject.label",
+        "data_path": "../../datasets/hypervision/data/web/codeinject.data",
+        "label_path": "../../datasets/hypervision/data/web/codeinject.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

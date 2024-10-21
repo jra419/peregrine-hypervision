@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/synsdos.data",
-        "label_path": "../data/synsdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/synsdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/synsdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/memcachedrdos.data",
-        "label_path": "../data/memcachedrdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/memcachedrdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/memcachedrdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

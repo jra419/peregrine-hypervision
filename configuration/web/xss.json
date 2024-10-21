@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/xss.data",
-        "label_path": "../data/xss.label",
+        "data_path": "../../datasets/hypervision/data/web/xss.data",
+        "label_path": "../../datasets/hypervision/data/web/xss.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

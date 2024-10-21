@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/webshell.data",
-        "label_path": "../data/webshell.label",
+        "data_path": "../../datasets/hypervision/data/web/webshell.data",
+        "label_path": "../../datasets/hypervision/data/web/webshell.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

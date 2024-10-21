@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/rstsdos.data",
-        "label_path": "../data/rstsdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/rstsdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/rstsdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

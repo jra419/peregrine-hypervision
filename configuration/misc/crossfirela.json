@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/crossfirela.data",
-        "label_path": "../data/crossfirela.label",
+        "data_path": "../../datasets/hypervision/data/misc/crossfirela.data",
+        "label_path": "../../datasets/hypervision/data/misc/crossfirela.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ipidport.data",
-        "label_path": "../data/ipidport.label",
+        "data_path": "../../datasets/hypervision/data/misc/ipidport.data",
+        "label_path": "../../datasets/hypervision/data/misc/ipidport.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

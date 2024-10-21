@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/udpsdos.data",
-        "label_path": "../data/udpsdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/udpsdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/udpsdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/telnetpwdla.data",
-        "label_path": "../data/telnetpwdla.label",
+        "data_path": "../../datasets/hypervision/data/misc/telnetpwdla.data",
+        "label_path": "../../datasets/hypervision/data/misc/telnetpwdla.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

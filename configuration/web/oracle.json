@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/oracle.data",
-        "label_path": "../data/oracle.label",
+        "data_path": "../../datasets/hypervision/data/web/oracle.data",
+        "label_path": "../../datasets/hypervision/data/web/oracle.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

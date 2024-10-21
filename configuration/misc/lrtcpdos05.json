@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/lrtcpdos05.data",
-        "label_path": "../data/lrtcpdos05.label",
+        "data_path": "../../datasets/hypervision/data/misc/lrtcpdos05.data",
+        "label_path": "../../datasets/hypervision/data/misc/lrtcpdos05.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ntprdos.data",
-        "label_path": "../data/ntprdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/ntprdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/ntprdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

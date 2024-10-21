@@ -1,8 +1,8 @@
 {
     "dataset_construct": {
-        "data_path": "../data/charrdos.data",
-        "label_path": "../data/charrdos.label",
-        "train_ratio": 0.0
+        "data_path": "../../datasets/hypervision/data/brute/charrdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/charrdos.label",
+        "train_ratio": 0.5
     },
     "flow_construct": {
         "flow_time_out": 10.0,

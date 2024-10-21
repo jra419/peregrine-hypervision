@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/dnsscan.data",
-        "label_path": "../data/dnsscan.label",
+        "data_path": "../../datasets/hypervision/data/brute/dnsscan.data",
+        "label_path": "../../datasets/hypervision/data/brute/dnsscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

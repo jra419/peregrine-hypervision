@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/icmpsdos.data",
-        "label_path": "../data/icmpsdos.label",
+        "data_path": "../../datasets/hypervision/data/brute/icmpsdos.data",
+        "label_path": "../../datasets/hypervision/data/brute/icmpsdos.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

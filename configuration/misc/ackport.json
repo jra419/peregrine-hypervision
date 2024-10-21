@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ackport.data",
-        "label_path": "../data/ackport.label",
+        "data_path": "../../datasets/hypervision/data/misc/ackport.data",
+        "label_path": "../../datasets/hypervision/data/misc/ackport.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

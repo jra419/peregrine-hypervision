@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/sshpwdmd.data",
-        "label_path": "../data/sshpwdmd.label",
+        "data_path": "../../datasets/hypervision/data/misc/sshpwdmd.data",
+        "label_path": "../../datasets/hypervision/data/misc/sshpwdmd.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

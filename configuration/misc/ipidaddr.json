@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/ipidaddr.data",
-        "label_path": "../data/ipidaddr.label",
+        "data_path": "../../datasets/hypervision/data/misc/ipidaddr.data",
+        "label_path": "../../datasets/hypervision/data/misc/ipidaddr.label",
         "train_ratio": 0.0
     },
     "flow_construct": {

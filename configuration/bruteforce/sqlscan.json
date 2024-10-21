@@ -1,7 +1,7 @@
 {
     "dataset_construct": {
-        "data_path": "../data/sqlscan.data",
-        "label_path": "../data/sqlscan.label",
+        "data_path": "../../datasets/hypervision/data/brute/sqlscan.data",
+        "label_path": "../../datasets/hypervision/data/brute/sqlscan.label",
         "train_ratio": 0.0
     },
     "flow_construct": {
