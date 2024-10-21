@@ -6,32 +6,22 @@ ninja
 
 
 ARR=(
-    # "dns_lrscan"
-    # "http_lrscan"
-    # "icmp_lrscan"
-    "icmp_lrscan-1"
+    # "icmp_lrscan-1"
     # "icmp_lrscan-64"
     # "icmp_lrscan-256"
     # "icmp_lrscan-1024"
-    # "netbios_lrscan"
-    # "rdp_lrscan"
     # "rdp_lrscan-1"
     # "rdp_lrscan-64"
     # "rdp_lrscan-256"
     # "rdp_lrscan-1024"
-    # "smtp_lrscan"
-    # "snmp_lrscan"
-    # "ssh_lrscan"
-    # "telnet_lrscan"
     # "telnet_lrscan-1"
     # "telnet_lrscan-64"
     # "telnet_lrscan-256"
     # "telnet_lrscan-1024"
-    # "vlc_lrscan"
 )
 
 for item in ${ARR[@]}; do
-    for (( counter=1; counter<=100; counter++ )) do
+    for (( counter=1; counter<="@1"; counter++ )) do
         ./HyperVision -config ../configuration/lrscan/${item}.json > ../cache/${item}.log # &
         mv  ../cache/${item}.log ../cache/lrscan/${item}-$counter.log
         mv  ../temp/${item}.txt ../temp/lrscan/${item}-$counter.txt
