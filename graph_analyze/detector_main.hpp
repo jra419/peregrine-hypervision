@@ -34,6 +34,7 @@ public:
     void start(void) {
         __START_FTIMMER__
 
+        // Read from pcap
         if (jin_main.count("packet_parse") &&
             jin_main["packet_parse"].count("target_file_path")) {
 
@@ -50,6 +51,7 @@ public:
             p_dataset_constructor->do_dataset_construct();
             p_label = p_dataset_constructor->get_label();
 
+        // Read from processed pkt data
         } else if (jin_main["dataset_construct"].count("data_path") &&
                     jin_main["dataset_construct"].count("label_path")){
             LOGF("Load & split datasets.");
@@ -64,15 +66,15 @@ public:
             LOGF("Dataset not found.");
         }
 
-        // for (const auto& packet_ptr : *p_parse_result) {
-        //     std::cout << "TS: " << std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10) << GET_DOUBLE_TS(packet_ptr->ts) << std::endl;
-        //     if (typeid(packet_ptr) == typeid(basic_packet4)) {
-        //         const auto _p_rep = dynamic_pointer_cast<basic_packet4>(packet_ptr);
-        //         const auto _stack_code = convert_packet2stack_code(_p_rep->tp);
-        //         const auto _flow_id = tuple4_extend(_p_rep->flow_id, _stack_code);
-        //         std::cout << "flow id: " << std::get<0>(_flow_id) << std::endl;
-        //     }
-        // }
+        for (const auto& packet_ptr : *p_parse_result) {
+            std::cout << "TS: " << std::fixed << std::setprecision(std::numeric_limits<double>::max_digits10) << GET_DOUBLE_TS(packet_ptr->ts) << std::endl;
+            if (typeid(packet_ptr) == typeid(basic_packet4)) {
+                const auto _p_rep = dynamic_pointer_cast<basic_packet4>(packet_ptr);
+                const auto _stack_code = convert_packet2stack_code(_p_rep->tp);
+                const auto _flow_id = tuple4_extend(_p_rep->flow_id, _stack_code);
+                std::cout << "flow id: " << std::get<0>(_flow_id) << std::endl;
+            }
+        }
 
         LOGF("Construct flow.");
         const auto p_flow_constructor = make_shared<explicit_flow_constructor>(p_parse_result);
