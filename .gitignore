@@ -16,7 +16,5 @@ json.hpp
 *.png
 *.pyc
 
-script/
 venv/
-docker/
 result_analyze/eval/
