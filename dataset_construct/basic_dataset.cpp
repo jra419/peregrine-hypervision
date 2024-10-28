@@ -1,9 +1,17 @@
 #include "basic_dataset.hpp"
 
-
 using namespace Hypervision;
 
-
+// Used to split p_parse_result, which contains all the processed packets,
+// into train/test sets (p_parse_train, p_parse_test), and then to generate
+// the trace labels (based on the attacker addresses defined in the config file).
+// Both p_parse_train and p_parse_test are only used here, the later analysis is
+// performed on p_parse_result only.
+// The original implementation generated labels for p_parse_test only,
+// resulting in an error at a later phase, since the graph analysis is performed
+// for the entire p_parse_result.
+// This is most likely a bug (no train/test separation is used later in the code)
+// I've changed it so that the labels are generated for all packets.
 void basic_dataset::do_dataset_construct(size_t multiplex) {
     __START_FTIMMER__
 
@@ -17,8 +25,10 @@ void basic_dataset::do_dataset_construct(size_t multiplex) {
     size_t line = ceil(p_parse_result->size() * train_ratio);
     p_parse_train = make_shared<decltype(p_parse_train)::element_type>
                         (p_parse_result->begin(), p_parse_result->begin() + line);
+    // p_parse_test = make_shared<decltype(p_parse_test)::element_type>
+    //                     (p_parse_result->begin() + line, p_parse_result->end());
     p_parse_test = make_shared<decltype(p_parse_test)::element_type>
-                        (p_parse_result->begin() + line, p_parse_result->end());
+                        (p_parse_result->begin(), p_parse_result->end());
     LOGF("[Train set: %8ld packets]", p_parse_train->size());
 
     p_label = make_shared<decltype(p_label)::element_type>();
@@ -147,6 +157,9 @@ void basic_dataset::configure_via_json(const json & jin) {
         }
         if (jin.count("attack_time_after")) {
             attack_time_after = static_cast<decltype(attack_time_after)>(jin["attack_time_after"]);
+        }
+        if (jin.count("train_num")) {
+            train_num = static_cast<decltype(train_num)>(jin["train_num"]);
         }
         if (jin.count("sampl")) {
             sampl = static_cast<decltype(sampl)>(jin["sampl"]);

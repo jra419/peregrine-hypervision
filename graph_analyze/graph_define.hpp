@@ -1,6 +1,5 @@
 #pragma once
 
-
 #include "../common.hpp"
 #include "edge_define.hpp"
 #include "edge_constructor.hpp"
@@ -14,9 +13,7 @@
 
 #include <z3++.h>
 
-
 namespace Hypervision {
-
 
 using long_edge_index = vector<size_t>;
 using short_edge_index = vector<size_t>;
@@ -124,6 +121,7 @@ private:
 
 public:
     auto graph_detect() {
+        // V-A. Connectivity Analysis
         proc_components(connected_component());
     }
 

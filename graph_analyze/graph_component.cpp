@@ -198,7 +198,7 @@ auto traffic_graph::connected_component() const -> shared_ptr<component> {
 
 auto traffic_graph::component_select(const shared_ptr<component> p_com) const -> shared_ptr<vector<size_t>> {
     __START_FTIMMER__
-    LOGF("Select strong connected conponents.");
+    LOGF("Select strong connected components.");
 
     const auto _f_extract_feature_component = [&] (const component::value_type & cp) -> feature_t {
         unordered_set<size_t> _long_index, _short_index, _short_agg_index;
@@ -306,7 +306,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 #ifdef DISP_SELECTED_COMPONENT_STA
     const auto _f_disp_selected_component = [&] (const size_t index) -> void {
         const auto _vec_feature = _f_extract_feature_component(p_com->at(index));
-        printf("Seclect Component: size %5d, long edge %5d, short edge %5d (Agg.: %5d).\n",
+        printf("Select Component: size %5d, long edge %5d, short edge %5d (Agg.: %5d).\n",
         (uint32_t) _vec_feature[0],
         (uint32_t) _vec_feature[1],
         (uint32_t) _vec_feature[2],
@@ -322,7 +322,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
         _f_disp_selected_component(selected_index);
 #endif
     }
-    LOGF("Seclect %ld components from %ld.", res_ptr->size(), loss_vec.size());
+    LOGF("Select %ld components from %ld.", res_ptr->size(), loss_vec.size());
 
     __STOP_FTIMER__
     __PRINTF_EXE_TIME__

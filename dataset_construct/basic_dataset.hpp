@@ -3,19 +3,17 @@
 #include "../common.hpp"
 #include "../packet_parse/pcap_parser.hpp"
 
-
-namespace Hypervision
-{
-
+namespace Hypervision {
 
 using binary_label_t = vector<bool>;
 
-
 class basic_dataset {
+
 private:
     shared_ptr<vector<shared_ptr<basic_packet> > > p_parse_result;
     shared_ptr<vector<shared_ptr<basic_packet> > > p_parse_train, p_parse_test;
     double_t train_ratio = 0.25;
+    uint32_t train_num = 0;
     uint32_t sampl = 1;
 
     shared_ptr<binary_label_t> p_label;
@@ -86,7 +84,7 @@ public:
     }
 
     // void import_dataset(void) {
-    void import_dataset(uint32_t train) {
+    void import_dataset() {
         __START_FTIMMER__
         ifstream _ifd(load_data_path);
         vector<string> string_temp;
@@ -95,10 +93,10 @@ public:
             string _s;
             if (getline(_ifd, _s)) {
                 count++;
-                if (count <= train) {
+                if (count <= train_num) {
                     string_temp.push_back(_s);
                 }
-                else if (count > train && count % sampl == 0) {
+                else if (count > train_num && count % sampl == 0) {
                     string_temp.push_back(_s);
                 } else {
                     continue;
@@ -152,10 +150,10 @@ public:
         uint32_t count_label = 0;
         for (const char a: ll) {
             count_label++;
-            if (count_label <= train) {
+            if (count_label <= train_num) {
                 p_label->push_back(a == '1');
             }
-            if (count_label > train && count_label % sampl == 0) {
+            if (count_label > train_num && count_label % sampl == 0) {
                 p_label->push_back(a == '1');
             } else {
                 continue;
@@ -167,8 +165,6 @@ public:
         __STOP_FTIMER__
         __PRINTF_EXE_TIME__
     }
-
 };
-
 
 }

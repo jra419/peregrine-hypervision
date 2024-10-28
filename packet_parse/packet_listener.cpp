@@ -1,27 +1,21 @@
-#include "pcap_parser.hpp"
+#include "packet_listener.hpp"
 
 using namespace Hypervision;
 
-auto pcap_parser::parse_raw_packet(size_t num_to_parse) -> decltype(p_raw_packet) {
-    __START_FTIMMER__
-
-    if (p_raw_packet) {
-        LOG("Parsing has been done, do it agagin.");
+void packet_listener::start_capture(string s) {
+    p_packet_vec = make_shared<pcpp::RawPacketVector>();
+    auto* dev = pcpp::PcapLiveDeviceList::getInstance().getPcapLiveDeviceByName(s);
+    if (dev == nullptr) {
+        FATAL_ERROR("Fail to read target interface.");
     }
-    p_raw_packet = make_shared<pcpp::RawPacketVector>();
-    if (!p_pcpp_file_reader->getNextPackets(*p_raw_packet, num_to_parse)) {
-        FATAL_ERROR("Couldn't read the first packet in the file.");
-    } else {
-        LOGF("Read %ld raw packet from %s.", p_raw_packet->size(), target_file_path.c_str());
+    // open the device before start capturing/sending packets
+    if (!dev->open()) {
+        FATAL_ERROR("Cannot open device.");
     }
-
-    __STOP_FTIMER__
-    __PRINTF_EXE_TIME__
-
-    return p_raw_packet;
+    dev->startCapture(*p_packet_vec);
 }
 
-auto pcap_parser::parse_basic_packet_fast(size_t multiplex) -> decltype(p_parse_result) {
+auto packet_listener::parse_basic_packet_fast(size_t multiplex) -> decltype(p_parse_result) {
     __START_FTIMMER__
 
     if (p_parse_result) {
@@ -29,15 +23,15 @@ auto pcap_parser::parse_basic_packet_fast(size_t multiplex) -> decltype(p_parse_
     }
 
     size_t bad_packet = 0;
-    p_parse_result = make_shared<vector<shared_ptr<basic_packet> > >(p_raw_packet->size());
-    const u_int32_t part_size = ceil(((double) p_raw_packet->size()) / ((double) multiplex));
+    p_parse_result = make_shared<vector<shared_ptr<basic_packet> > >(p_packet_vec->size());
+    const u_int32_t part_size = ceil(((double) p_packet_vec->size()) / ((double) multiplex));
     vector<pair<size_t, size_t> > _assign;
     for (size_t core = 0, idx = 0; core < multiplex; ++ core, idx += part_size) {
-        _assign.push_back({idx, min(idx + part_size, p_raw_packet->size())});
+        _assign.push_back({idx, min(idx + part_size, p_packet_vec->size())});
     }
 
     auto __f =  [&] (const size_t _start, const size_t _end, 
-            decltype(p_raw_packet) _from, decltype(p_parse_result) _to) -> void {
+            decltype(p_packet_vec) _from, decltype(p_parse_result) _to) -> void {
         for (size_t i = _start; i < _end; i ++) {
             const auto & __p_raw_pk = (*_from).at(i);
             unique_ptr<pcpp::Packet> p_parsed_packet(
@@ -153,7 +147,8 @@ auto pcap_parser::parse_basic_packet_fast(size_t multiplex) -> decltype(p_parse_
     vector<thread> vt;
     assert(multiplex > 0);
     for (size_t core = 0; core < multiplex; core ++ ) {
-        vt.emplace_back(__f, _assign[core].first, _assign[core].second, p_raw_packet, p_parse_result);
+        vt.emplace_back(__f, _assign[core].first, _assign[core].second,
+                        p_packet_vec, p_parse_result);
     }
 
     for (auto & t : vt)
@@ -166,7 +161,7 @@ auto pcap_parser::parse_basic_packet_fast(size_t multiplex) -> decltype(p_parse_
     return p_parse_result;
 }
 
-void pcap_parser::type_statistic(void) const {
+void packet_listener::type_statistic(void) const {
     __START_FTIMMER__
 
     if (p_parse_result == nullptr) {

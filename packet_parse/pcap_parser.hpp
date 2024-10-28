@@ -11,7 +11,6 @@ using namespace std;
 
 namespace Hypervision {
 
-
 class pcap_parser final  {
 private:
     const string target_file_path;

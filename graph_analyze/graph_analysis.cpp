@@ -21,7 +21,10 @@ auto traffic_graph::_proc_each_component(const vector<addr_t> & addr_ls) -> void
         arma::mat centroids_short;
         arma::mat dataset_short;
         arma::Row<size_t> assignments_short;
+        // V-B. Edge pre-clustering
         if (_pre_process_short(_short_index, dataset_short, centroids_short, assignments_short) >= 1) {
+            // VI. Malicious traffic detection
+            // VI-B. Edge feature clustering for detection
             _process_short(_short_index, dataset_short, centroids_short, assignments_short);
         }
     }
@@ -31,7 +34,11 @@ auto traffic_graph::_proc_each_component(const vector<addr_t> & addr_ls) -> void
     if (_long_index.size() >= 1) {
         arma::mat centroids_long;
         arma::Row<size_t> assignments_long;
+        // V-B. Edge pre-clustering
         if (_pre_process_long(_long_index, centroids_long, assignments_long) >= 1) {
+            // VI. Malicious traffic detection
+            // VI-A. Identifying critical vertices
+            // VI-B. Edge feature clustering for detection
             _process_long(_long_index, centroids_long, assignments_long);
         }
     }

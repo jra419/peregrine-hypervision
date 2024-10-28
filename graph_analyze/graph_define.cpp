@@ -1,8 +1,6 @@
 #include "graph_define.hpp"
 
-
 using namespace Hypervision;
-
 
 auto traffic_graph::is_huge_short_edge(const addr_t addr) const -> bool {
     if ((short_edge_in.count(addr) && short_edge_in.at(addr).size() > huge_short_line) ||
@@ -11,7 +9,6 @@ auto traffic_graph::is_huge_short_edge(const addr_t addr) const -> bool {
     else
         return false;
 }
-
 
 auto traffic_graph::is_huge_agg_short_edge(const addr_t & addr) const -> bool {
     if (short_edge_in_agg.count(addr))
@@ -27,7 +24,6 @@ auto traffic_graph::is_huge_agg_short_edge(const addr_t & addr) const -> bool {
     return false;
 }
 
-
 void traffic_graph::dump_vertex_anomly(void) const {
     size_t va = 0, vga = 0;
     for(const auto & add: vertex_set_short) {
@@ -38,7 +34,6 @@ void traffic_graph::dump_vertex_anomly(void) const {
     }
     LOGF("Invalid vertex: %ld, Invalide aggregate: %ld.", va, vga);
 }
-
 
 void traffic_graph::dump_edge_anomly(void) const {
     array<size_t, 3> sta = {0};
@@ -55,7 +50,6 @@ void traffic_graph::dump_edge_anomly(void) const {
     }
     LOGF("Huge flow: %ld, Pulse flow: %ld, Invalid flow: %ld.", sta[0], sta[1], sta[2]);
 }
-
 
 auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label) -> const decltype(p_pkt_score) {
     __START_FTIMMER__
@@ -101,14 +95,11 @@ auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label
     cout << res_abnormal / n_abnormal << endl;
     cout << res_normal / n_normal << endl;
 
-
-
     __STOP_FTIMER__
     __PRINTF_EXE_TIME__
 
     return p_pkt_score;
 }
-
 
 void traffic_graph::config_via_json(const json & jin) {
     try {
@@ -159,7 +150,6 @@ void traffic_graph::config_via_json(const json & jin) {
         if (jin.count("offset_s")) {
             offset_s = static_cast<decltype(offset_s)>(jin["offset_s"]);
         }
-
         if (jin.count("select_ratio")) {
             select_ratio = static_cast<decltype(select_ratio)>(jin["select_ratio"]);
             if (select_ratio < EPS) {

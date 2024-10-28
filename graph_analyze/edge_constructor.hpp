@@ -43,7 +43,9 @@ public:
     void do_construct(void) {
         raw_flow_vec short_flow_pvec, long_flow_pvec;
         flow_classification(short_flow_pvec, long_flow_pvec);
+        // Short flow aggregation
         construct_long_flow(long_flow_pvec);
+        // Long flow feat. distrib. fitting
         construct_short_flow(short_flow_pvec);
         LOGF("After aggregation: %ld short edges [%ld pkts], %ld long edges [%ld pkts].", 
             p_short_edges->size(), short_packet_sum, p_long_edges->size(), long_packet_sum);
