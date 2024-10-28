@@ -51,13 +51,13 @@ RUN sudo apt update && sudo apt -y install \
     python3 \
     python3-pip \
     bash \
-    bear \
     clang \
     clang-tools \
     clangd \
     ripgrep \
     shellcheck \
-    fzf
+    fzf \
+    libomp-dev
 
 RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo debconf-set-selections && \
     sudo apt install -y tshark

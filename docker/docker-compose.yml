@@ -7,7 +7,7 @@ services:
               source: ../
               target: /home/docker/hypervision
             - type: bind
-              source: /run/media/jra/Hinamizawa/Datasets
+              source: /mnt/data/datasets
               target: /home/docker/datasets
             - type: bind
               source: ~/.gitconfig
