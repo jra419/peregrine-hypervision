@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
 project(HyperVision)
 set(CMAKE_CXX_STANDARD 14)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 add_subdirectory(flow_construct)
 add_subdirectory(dataset_construct)
 add_subdirectory(packet_parse)
@@ -9,7 +11,6 @@ add_subdirectory(graph_analyze)
 
 # add_library(nlohmann::json STATIC json.hpp)
 # target_include_directories(nlohmann::json PUBLIC /opt/scripts)
-
 
 aux_source_directory(. DIR_SRCS)
 add_executable(${PROJECT_NAME} "${DIR_SRCS}")
