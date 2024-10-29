@@ -8,7 +8,7 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 # The install scripts require sudo (no need to clean apt cache, the setup script will install stuff)
 RUN apt update
-RUN apt install -y sudo
+RUN apt install -y sudo adduser
 
 # Create a user with passwordless sudo
 RUN adduser --disabled-password --gecos '' docker
@@ -56,21 +56,29 @@ RUN sudo apt update && sudo apt -y install \
     clangd \
     ripgrep \
     shellcheck \
-    fzf \
     libomp-dev
 
 RUN echo "wireshark-common wireshark-common/install-setuid boolean true" | sudo debconf-set-selections && \
     sudo apt install -y tshark
 
-# RUN git clone --branch 0.23.1 https://github.com/junegunn/fzf.git && \
-#     cd fzf && \
-#     awk 'NR==110 {$0="	cp -f target/$(BINARY) /usr/bin/fzf"} 1' Makefile > Makefile.tmp && \
-#     rm Makefile && \
-#     mv Makefile.tmp Makefile && \
-#     make && \
-#     sudo make install && \
-#     cd .. && \
-#     rm -r fzf
+RUN cd /tmp/ && \
+    wget https://go.dev/dl/go1.23.2.linux-amd64.tar.gz && \
+    sudo tar -C /usr/local -xzf go1.23.2.linux-amd64.tar.gz && \
+    echo "export PATH=$PATH:/usr/local" >> /home/docker/.profile && \
+    echo "export PATH=$PATH:/usr/local/go/bin" >> /home/docker/.profile
+
+ENV PATH="$PATH:/usr/local"
+ENV PATH="$PATH:/usr/local/go/bin"
+
+RUN git clone https://github.com/junegunn/fzf.git && \
+    cd fzf && \
+    awk 'NR==176 {$0="\tcp -f target/$(BINARY) /usr/bin/fzf"} 1' Makefile > Makefile.tmp && \
+    rm Makefile && \
+    mv Makefile.tmp Makefile && \
+    make && \
+    sudo PATH=$PATH:/usr/local:/usr/local/go/bin make install && \
+    cd .. && \
+    rm -r fzf
 
 RUN sudo dpkg-reconfigure --frontend noninteractive tzdata
 
