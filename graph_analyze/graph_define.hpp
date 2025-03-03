@@ -13,7 +13,7 @@
 
 #include <z3++.h>
 
-namespace Hypervision {
+namespace hypervision {
 
 using long_edge_index = vector<size_t>;
 using short_edge_index = vector<size_t>;
@@ -127,7 +127,8 @@ public:
 
     auto proc_components(const shared_ptr<component> p_com) -> void;
 
-    auto get_final_pkt_score(const shared_ptr<binary_label_t> p_label) -> const decltype(p_pkt_score);
+    // auto get_final_pkt_score(const shared_ptr<binary_label_t> p_label) -> const decltype(p_pkt_score);
+    auto get_final_pkt_score(const binary_label_t p_label) -> const decltype(p_pkt_score);
 
     void config_via_json(const json & jin);
 

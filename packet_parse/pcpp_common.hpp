@@ -10,7 +10,7 @@
 #include <pcapplusplus/PcapFileDevice.h>
 #include <pcapplusplus/UdpLayer.h>
 
-namespace Hypervision {
+namespace hypervision {
 
 static auto string_2_uint128(const std::string input) -> __uint128_t {
     const char * str = input.c_str();

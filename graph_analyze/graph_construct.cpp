@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 void traffic_graph::parse_short_edge(void) {
@@ -181,9 +181,9 @@ void traffic_graph::dump_graph_statistic_short(void) const {
     };
 
     auto ___f = [&] (const size_collector & col) -> void {
-        for (const auto & ref: col) {
-            printf("|- %5ld-%-5ld\n", ref.first, ref.second);
-        }
+        // for (const auto & ref: col) {
+            // printf("|- %5ld-%-5ld\n", ref.first, ref.second);
+        // }
     };
 
     __f(short_edge_in, size_mp_in);
@@ -191,14 +191,14 @@ void traffic_graph::dump_graph_statistic_short(void) const {
     __f(short_edge_out, size_mp_out);
     __f(short_edge_out_agg, size_mp_out_agg);
 
-    printf("short edge in-degree.\n");
-    ___f(size_mp_in);
-    printf("short edge in-degree (aggregate).\n");
-    ___f(size_mp_in_agg);
-    printf("short edge out-degree.\n");
-    ___f(size_mp_out);
-    printf("short edge out-degree (aggregate).\n");
-    ___f(size_mp_out_agg);
+    // printf("short edge in-degree.\n");
+    // ___f(size_mp_in);
+    // printf("short edge in-degree (aggregate).\n");
+    // ___f(size_mp_in_agg);
+    // printf("short edge out-degree.\n");
+    // ___f(size_mp_out);
+    // printf("short edge out-degree (aggregate).\n");
+    // ___f(size_mp_out_agg);
 
 #endif
 

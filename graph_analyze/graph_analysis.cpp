@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 auto traffic_graph::_proc_each_component(const vector<addr_t> & addr_ls) -> void {

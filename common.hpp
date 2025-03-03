@@ -124,7 +124,7 @@ static inline auto get_time_spec(double dtime) -> timespec {
         #else
             #warning LOG Define Conflict
         #endif
-        
+
     #endif
 
     #define LOG_LOCATE() LOG("")

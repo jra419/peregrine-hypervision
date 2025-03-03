@@ -1,7 +1,7 @@
 #include "edge_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 const auto __get4_tuple = [] (shared_ptr<basic_flow> pf,

@@ -5,8 +5,7 @@
 #include "../flow_construct/flow_define.hpp"
 
 
-namespace Hypervision
-{
+namespace hypervision {
 
 using len_db = map<pkt_len_t, u_int32_t>;
 using type_db = map<pkt_code_t, u_int32_t>;
@@ -68,9 +67,7 @@ public:
     inline auto get_time_range(void) const -> pair<flow_time_t, flow_time_t> {
         return {p_flow->get_str_time(), p_flow->get_end_time()};
     }
-
 };
-
 
 using agg_code = u_int16_t;
 enum agg_type: u_int8_t {

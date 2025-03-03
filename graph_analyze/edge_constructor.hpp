@@ -8,17 +8,16 @@
 #include<boost/functional/hash.hpp>
 
 
-namespace Hypervision
-{
+namespace hypervision {
 
-using raw_flow_vec = vector<shared_ptr<basic_flow> >;
+using raw_flow_vec = vector<shared_ptr<basic_flow>>;
 
 class edge_constructor {
 private:
     shared_ptr<raw_flow_vec> p_parse_result;
 
-    shared_ptr<vector<shared_ptr<long_edge> > > p_long_edges;
-    shared_ptr<vector<shared_ptr<short_edge> > > p_short_edges;
+    shared_ptr<vector<shared_ptr<long_edge>>> p_long_edges;
+    shared_ptr<vector<shared_ptr<short_edge>>> p_short_edges;
 
     u_int16_t LENGTH_BIN_SIZE = 10;
     u_int16_t TIME_BIN_SIZE = 1e-3;
@@ -75,7 +74,7 @@ public:
 
     void config_via_json(const json & jin);
     void show_short_edge_statistic(void) const;
-    
+
 };
 
 }

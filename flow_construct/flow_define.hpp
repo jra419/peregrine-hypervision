@@ -3,8 +3,7 @@
 #include "../common.hpp"
 #include "../packet_parse/packet_basic.hpp"
 
-namespace Hypervision
-{
+namespace hypervision {
 
 using flow_time_t = double_t;
 
@@ -15,7 +14,9 @@ protected:
     flow_time_t end = numeric_limits<flow_time_t>::min();
     pkt_code_t code = 0;
     shared_ptr<vector<shared_ptr<basic_packet> > > p_packet_p_seq;
+    vector<basic_packet4> packet_p_seq;
     shared_ptr<vector<size_t> > p_reverse_index;
+    vector<size_t> reverse_index;
 
 public:
     basic_flow() {
@@ -40,16 +41,22 @@ public:
     basic_flow(const basic_flow&) = default;
     basic_flow & operator=(const basic_flow&) = default;
 
-    bool emplace_packet(const shared_ptr<basic_packet> p, const size_t rid) {
-        if (typeid(*p) == typeid(basic_packet_bad)) {
+    // bool emplace_packet(const shared_ptr<basic_packet> p, const size_t rid) {
+    bool emplace_packet(const basic_packet4 p, const size_t rid) {
+        // if (typeid(*p) == typeid(basic_packet_bad)) {
+        if (typeid(p) == typeid(basic_packet_bad)) {
             return false;
         } else {
-            auto ts = GET_DOUBLE_TS(p->ts);
+            // auto ts = GET_DOUBLE_TS(p->ts);
+            auto ts = GET_DOUBLE_TS(p.ts);
             str = min(str, ts);
             end = max(end, ts);
-            code |= p->tp;
-            p_packet_p_seq->push_back(p);
-            p_reverse_index->push_back(rid);
+            // code |= p->tp;
+            code |= p.tp;
+            // p_packet_p_seq->push_back(p);
+            packet_p_seq.push_back(p);
+            // p_reverse_index->push_back(rid);
+            reverse_index.push_back(rid);
             return true;
         }
     }

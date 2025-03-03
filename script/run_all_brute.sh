@@ -10,6 +10,7 @@ ARR=(
     # "charrdos-64"
     # "charrdos-256"
     # "charrdos-1024"
+    "charrdos-1024-test"
     # "cldaprdos-1"
     # "cldaprdos-64"
     # "cldaprdos-256"
@@ -66,12 +67,12 @@ ARR=(
 
 for item in ${ARR[@]}; do
     for (( counter=1; counter<="$1"; counter++ )) do
-        ./HyperVision -config ../configuration/bruteforce/sampl/${item}.json > ../cache/${item}.log # &
+        ./HyperVision ../configuration/bruteforce/sampl/${item}.json stream > ../cache/${item}.log # &
         mv  ../cache/${item}.log ../cache/brute/${item}-$counter.log
         mv  ../temp/${item}.txt ../temp/brute/${item}-$counter.txt
     done
-    cd ../result_analyze
-    python3 batch_analyzer-single.py -g ${item}-mass
-    cd ../build
-    rm  ../temp/brute/${item}*.txt
+    # cd ../result_analyze
+    # python3 batch_analyzer-single.py -g ${item}-mass
+    # cd ../build
+    # rm  ../temp/brute/${item}*.txt
 done

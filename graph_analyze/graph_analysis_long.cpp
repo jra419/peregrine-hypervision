@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 void traffic_graph::_process_long(const unordered_set<size_t> & _long_index,

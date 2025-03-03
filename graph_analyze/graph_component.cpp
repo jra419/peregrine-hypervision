@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 auto traffic_graph::connected_component() const -> shared_ptr<component> {
@@ -203,6 +203,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
     const auto _f_extract_feature_component = [&] (const component::value_type & cp) -> feature_t {
         unordered_set<size_t> _long_index, _short_index, _short_agg_index;
         for (const addr_t addr: cp) {
+            // cout << "addr: " << addr << endl;
             if (long_edge_out.count(addr)){
                 const auto & __index_ls = long_edge_out.at(addr);
                 _long_index.insert(cbegin(__index_ls), cend(__index_ls));
@@ -226,9 +227,7 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
         for (const size_t idx: _long_index) {
             const auto db_ref = p_long_edge->at(idx)->get_length_distribution();
             for (const auto & ref: *db_ref) {
-                byte_ctr_long += ref.first * ref.second;
-                // Original assignment below, counted (wrongly) packets instead of bytes.
-                // byte_ctr_long += ref.second;
+                byte_ctr_long += ref.second;
             }
         }
         for (const size_t idx: _short_index) {
@@ -240,7 +239,13 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
             }
             byte_ctr_short += acc * edge_size;
         }
-
+        // cout << "Feat extract components" << endl;
+        // cout << cp.size() << endl;
+        // cout << _long_index.size() << endl;
+        // cout << _short_index.size() << endl;
+        // cout << _short_agg_index.size() << endl;
+        // cout << byte_ctr_long << endl;
+        // cout << byte_ctr_short << "\n" << endl;
         return {
             (double) cp.size(),
             (double) _long_index.size(),

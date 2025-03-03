@@ -5,21 +5,24 @@
 
 using namespace std;
 
-namespace Hypervision {
+namespace hypervision {
 
 union __pkt_addr6 {
     __uint128_t num_rep;
     uint8_t byte_rep[16];
 };
 
-using pkt_addr4_t = u_int32_t;
+using pkt_addr4_t = uint32_t;
 using pkt_addr6_t = __uint128_t;
-using pkt_len_t = u_int16_t;
-using pkt_port_t = u_int16_t;
-using pkt_ts_t = timespec;
+using pkt_cnt_t = uint32_t;
+using pkt_len_t = uint32_t;
+using pkt_port_t = uint16_t;
+// using pkt_ts_t = timespec;
+using pkt_ts_t = uint32_t;
+using pkt_code_t = uint16_t;
+using pkt_proto_t = uint16_t;
 
-using pkt_code_t = u_int16_t;
-enum pkt_type_t : u_int8_t {
+enum pkt_type_t : uint8_t {
     IPv4,
     IPv6,
     ICMP,

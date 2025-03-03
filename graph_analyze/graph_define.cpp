@@ -1,6 +1,6 @@
 #include "graph_define.hpp"
 
-using namespace Hypervision;
+using namespace hypervision;
 
 auto traffic_graph::is_huge_short_edge(const addr_t addr) const -> bool {
     if ((short_edge_in.count(addr) && short_edge_in.at(addr).size() > huge_short_line) ||
@@ -35,23 +35,23 @@ void traffic_graph::dump_vertex_anomly(void) const {
     LOGF("Invalid vertex: %ld, Invalide aggregate: %ld.", va, vga);
 }
 
-void traffic_graph::dump_edge_anomly(void) const {
-    array<size_t, 3> sta = {0};
-    for(const auto & pe : * p_long_edge) {
-        if (pe->is_huge_flow()) {
-            ++ sta[0];
-        }
-        if (pe->is_pulse_flow()) {
-            ++ sta[1];
-        }
-        if (pe->is_invalid_flow()) {
-            ++ sta[2];
-        }
-    }
-    LOGF("Huge flow: %ld, Pulse flow: %ld, Invalid flow: %ld.", sta[0], sta[1], sta[2]);
-}
+// void traffic_graph::dump_edge_anomly(void) const {
+//     array<size_t, 3> sta = {0};
+//     for(const auto & pe : * p_long_edge) {
+//         if (pe->is_huge_flow()) {
+//             ++ sta[0];
+//         }
+//         if (pe->is_pulse_flow()) {
+//             ++ sta[1];
+//         }
+//         if (pe->is_invalid_flow()) {
+//             ++ sta[2];
+//         }
+//     }
+//     LOGF("Huge flow: %ld, Pulse flow: %ld, Invalid flow: %ld.", sta[0], sta[1], sta[2]);
+// }
 
-auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label) -> const decltype(p_pkt_score) {
+auto traffic_graph::get_final_pkt_score(const binary_label_t p_label) -> const decltype(p_pkt_score) {
     __START_FTIMMER__
 
     if (p_pkt_score != nullptr) {
@@ -59,7 +59,7 @@ auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label
     }
 
     p_pkt_score = make_shared<score_t>();
-    fill_n(back_inserter(*p_pkt_score), p_label->size(), -1);
+    fill_n(back_inserter(*p_pkt_score), p_label.size(), -1);
     for (size_t i = 0; i < p_long_edge->size(); ++ i) {
         const auto ref = p_long_edge->at(i)->get_raw_flow();
         for (const auto index: *ref->get_p_reverse_id()) {
@@ -86,11 +86,11 @@ auto traffic_graph::get_final_pkt_score(const shared_ptr<binary_label_t> p_label
     assert(p_loss->size() == p_label->size());
     double_t res_abnormal = 0.0;
     double_t res_normal = 0.0;
-    size_t n_abnormal = count(p_label->begin(), p_label->end(), true);
-    size_t n_normal = p_label->size() - n_abnormal;
+    size_t n_abnormal = count(p_label.begin(), p_label.end(), true);
+    size_t n_normal = p_label.size() - n_abnormal;
     for (size_t i = 0; i < p_loss->size(); ++ i) {
-        res_normal += ((double_t) !p_label->at(i)) * p_loss->at(i);
-        res_abnormal += ((double_t) p_label->at(i)) * p_loss->at(i);
+        res_normal += ((double_t) !p_label.at(i)) * p_loss->at(i);
+        res_abnormal += ((double_t) p_label.at(i)) * p_loss->at(i);
     }
     cout << res_abnormal / n_abnormal << endl;
     cout << res_normal / n_normal << endl;

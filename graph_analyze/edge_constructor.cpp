@@ -1,7 +1,7 @@
 #include "edge_constructor.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 void edge_constructor::flow_classification(raw_flow_vec & short_flow_pvec, raw_flow_vec &  long_flow_pvec) {
@@ -51,18 +51,9 @@ void edge_constructor::construct_long_flow(raw_flow_vec & long_flow_pvec, size_t
             shared_ptr<interval_db> _time_db = make_shared<interval_db>();
             double_t time_ctr = GET_DOUBLE_TS(p_pkt_seq->at(0)->ts);
 
-            cout << "Processing flow...: " << endl;
             for (const auto p_p: *p_pkt_seq) {
-                cout << "code: " << p_p->tp << endl;
-                cout << "ts: " << GET_DOUBLE_TS(p_p->ts) << endl;
-                cout << "len: " << p_p->len << endl;
                 size_t __fuzzing_len = (p_p->len / LENGTH_BIN_SIZE) * LENGTH_BIN_SIZE;
                 size_t __fuzzing_time = floor(max(GET_DOUBLE_TS(p_p->ts) - time_ctr, 0.0) / TIME_BIN_SIZE);
-                cout << "fuzzing ts time_ctr: " << time_ctr << endl;
-                cout << "fuzzing ts num: " << max(GET_DOUBLE_TS(p_p->ts) - time_ctr, 0.0) << endl;
-                cout << "fuzzing ts dem: " << TIME_BIN_SIZE << endl;
-                cout << "fuzzing ts: " << __fuzzing_time << endl;
-                cout << "fuzzing len: " << __fuzzing_len << "\n" << endl;
                 time_ctr = max(time_ctr, GET_DOUBLE_TS(p_p->ts));
                 pkt_code_t __type = p_p->tp;
 
@@ -81,34 +72,7 @@ void edge_constructor::construct_long_flow(raw_flow_vec & long_flow_pvec, size_t
                 } else {
                     _time_db->at(__fuzzing_time) ++;
                 }
-                // PRINT ENTIRE TIME_DB
-                // cout << "\nTIME_DB (during):\n" <<endl;
-                // for (auto i: *_time_db) {
-                //     cout << "1st: " << i.first << endl;
-                //     cout << "2nd: " << i.second << "\n" << endl;
-                // }
-
-                cout << "\nLEN_DB (during):\n" <<endl;
-                for (auto i: *_len_db) {
-                    cout << "1st: " << i.first << endl;
-                    cout << "2nd: " << i.second << "\n" << endl;
-                }
             }
-
-            // PRINT ENTIRE TIME_DB
-            // cout << "\nTIME_DB (during):\n" <<endl;
-            // for (auto i: *_time_db) {
-            //     cout << "1st: " << i.first << endl;
-            //     cout << "2nd: " << i.second << "\n" << endl;
-            // }
-
-            cout << "\nLEN_DB:\n" <<endl;
-            size_t byte_ctr_long = 0;
-            for (auto i: *_len_db) {
-                cout << "1st: " << i.first << endl;
-                byte_ctr_long += i.second;
-            }
-            cout << "byte_cnt_long: " << byte_ctr_long << "\n" << endl;
 
             const auto _long_to_add = make_shared<long_edge>(p_f, _len_db, _type_db, _time_db);
             temp_result->push_back(_long_to_add);
@@ -149,6 +113,8 @@ void edge_constructor::construct_short_flow(raw_flow_vec & short_flow_pvec) {
     for (const auto p_f: short_flow_pvec) {
         if (typeid(*p_f) == typeid(tuple5_flow4)) {
             const auto p_f4 = dynamic_pointer_cast<tuple5_flow4>(p_f);
+            // cout << "ip src: " << tuple_get_src_addr(p_f4->flow_id) << endl;
+            // cout << "ip dst: " << tuple_get_dst_addr(p_f4->flow_id) << endl;
             f_src_vec.push_back(tuple_get_src_addr(p_f4->flow_id));
             f_dst_vec.push_back(tuple_get_dst_addr(p_f4->flow_id));
         } else {

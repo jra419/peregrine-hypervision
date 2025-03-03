@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 auto traffic_graph::__f_get_inout_degree(const addr_t addr) const -> pair<size_t, size_t> {
@@ -126,12 +126,19 @@ auto traffic_graph::_f_exeract_feature_long2(const size_t index) const -> featur
         long_edge_out.count(_daddr) ? (double) long_edge_out.at(_daddr).size() : 0.0,
         long_edge_in.count(_daddr) ? (double) long_edge_in.at(_daddr).size() : 0.0,
 
+        // Protocol associated with the max bin size
         (double_t) iter1->first,
+        // Max bin size (fitting protocol distribution)
         (double_t) iter1->second,
+        // Length associated with the max bin size
         (double_t) iter2->first,
+        // Max bin size (fitting packet length distribution)
         (double_t) iter2->second,
+        // Number of packets in the long flow
         (double_t) num_ctr,
+        // Flow completion time
         (double_t) _time_pair.second - _time_pair.first,
+        // Packet rate of the long flow
         (double_t) p_e->get_avg_packet_rate()
     };
 };
@@ -203,7 +210,7 @@ auto traffic_graph::_pre_process_short(const unordered_set<size_t> & _short_inde
         }
     }
     for (int j = 0; j < centroids_short.size(); j ++) {
-        printf("[----------- CLuster Number %d ---------]\n", j);
+        // printf("[----------- CLuster Number %d ---------]\n", j);
         int i = 0;
         for(const auto & index: _short_index) {
             if (assignments_short[i] == j) {
@@ -212,10 +219,10 @@ auto traffic_graph::_pre_process_short(const unordered_set<size_t> & _short_inde
                 ++ i;
             }
         }
-        printf("[----------- %d Edges in Cluster ---------]\n\n", i);
+        // printf("[----------- %d Edges in Cluster ---------]\n\n", i);
     }
-    printf("[Number of edge in cluster: %d]\n", c0);
-    printf("[Number of aggregated cluster: %d]\n", c1);
+    // printf("[Number of edge in cluster: %d]\n", c0);
+    // printf("[Number of aggregated cluster: %d]\n", c1);
 #endif
 
     size_t ret = 0;
@@ -257,7 +264,7 @@ auto traffic_graph::_pre_process_long(const unordered_set<size_t> & _long_index,
         }
     }
     for (int j = 0; j < centroids_long.size(); j ++) {
-        printf("------------- CLuster Number %d ---------\n", j);
+        // printf("------------- CLuster Number %d ---------\n", j);
         int i = 0;
         for(const auto & index: _long_index) {
             if (assignments_long[i] == j) {
@@ -267,8 +274,8 @@ auto traffic_graph::_pre_process_long(const unordered_set<size_t> & _long_index,
             ++ i;
         }
     }
-    printf("Number of edge in cluster: %d\n", ctr);
-    printf("Number of aggregated cluster: %d\n", ctr1);
+    // printf("Number of edge in cluster: %d\n", ctr);
+    // printf("Number of aggregated cluster: %d\n", ctr1);
 #endif
 
     size_t ret = 0;

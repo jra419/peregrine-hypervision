@@ -1,7 +1,7 @@
 #include "graph_define.hpp"
 
 
-using namespace Hypervision;
+using namespace hypervision;
 
 
 void traffic_graph::_process_short(const unordered_set<size_t> & _short_index, const arma::mat & dataset_short,
