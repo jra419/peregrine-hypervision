@@ -1,17 +1,6 @@
+.cache/
 build/
-/cache
-/data
-/temp
+cmake/
+eval/
 
-json.hpp
-
-/env/*/
-!/env/*.sh
-!/env/*.dockerfile
-
-*.log
-*.png
-*.pyc
-
-venv/
-result_analyze/eval/
+compile_commands.json

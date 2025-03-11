@@ -1,28 +1,64 @@
-cmake_minimum_required(VERSION 3.16 FATAL_ERROR)
-project(HyperVision)
-set(CMAKE_CXX_STANDARD 14)
+cmake_minimum_required(VERSION 3.16)
+project(hypervision)
 
+###############################################################################
+# C++ standard version
+###############################################################################
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
+
+###############################################################################
+# Compilation flags
+###############################################################################
+
+add_compile_options(
+	-Wall -Wextra -Werror -Wfatal-errors
+	-Wno-unused-variable -Wno-unused-parameter
+)
+
+set(CMAKE_INSTALL_RPATH_USE_LINK_PATH TRUE)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
-add_subdirectory(flow_construct)
-add_subdirectory(dataset_construct)
-add_subdirectory(packet_parse)
-add_subdirectory(graph_analyze)
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0 -DDEBUG")
+set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O3")
 
-# add_library(nlohmann::json STATIC json.hpp)
-# target_include_directories(nlohmann::json PUBLIC /opt/scripts)
+set(CFLAGS "-fopenmp")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${CFLAGS}")
 
-aux_source_directory(. DIR_SRCS)
-add_executable(${PROJECT_NAME} "${DIR_SRCS}")
+###############################################################################
+# Variables
+###############################################################################
 
-find_path(/opt/scripts json.hpp)
-target_include_directories(${PROJECT_NAME} PRIVATE /opt/scripts)
+set(PROG "hypervision")
+set(CUR_DIR ${CMAKE_CURRENT_SOURCE_DIR})
+set(SRC_DIR "${CUR_DIR}/src")
 
-target_link_libraries(${PROJECT_NAME} gflags)
-target_link_libraries(${PROJECT_NAME} graph_analysis)
-target_link_libraries(${PROJECT_NAME} flow_construct)
-target_link_libraries(${PROJECT_NAME} dataset_construct)
-target_link_libraries(${PROJECT_NAME} packet_parse)
-# target_link_libraries(${PROJECT_NAME} nlohmann::json)
-# target_link_libraries(${PROJECT_NAME} /opt/scripts/json.hpp)
+###############################################################################
+# Output targets
+###############################################################################
 
+file(GLOB_RECURSE SOURCES "${SRC_DIR}/*.cpp")
+file(GLOB_RECURSE HEADERS "${SRC_DIR}/*.h")
+
+add_executable(${PROG} ${SOURCES})
+
+###############################################################################
+# External projects
+###############################################################################
+
+include(${CMAKE_SOURCE_DIR}/cmake/find_json.cmake)
+find_package(OpenMP)
+
+target_link_libraries(${PROG}
+	nlohmann_json::nlohmann_json
+	libPcap++.a
+	libPacket++.a
+	libCommon++.a
+	pcap
+	pthread
+	OpenMP::OpenMP_CXX
+	armadillo
+	mlpack
+	z3
+)
