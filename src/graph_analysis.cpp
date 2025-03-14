@@ -42,7 +42,9 @@ auto traffic_graph::_proc_each_component(const vector<addr_t> & addr_ls) -> void
 }
 
 auto traffic_graph::proc_components(const shared_ptr<component> p_com) -> void {
-	LOGF("Proc components.");
+	#ifdef DEBUG
+		LOGF("Proc components.");
+	#endif
 	const auto p_select = component_select(p_com);
 	for (const auto index: *p_select) {
 		_proc_each_component(p_com->at(index));

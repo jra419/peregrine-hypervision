@@ -8,6 +8,7 @@
 #include <iostream>
 #include <fstream>
 #include <iomanip>
+#include <chrono>
 
 #include "edge_constructor.hpp"
 #include "flow.hpp"
@@ -21,10 +22,10 @@ class Hypervision {
 
 private:
 	nlohmann::json jin_main;
-	string file_path	= "";
-	string interface	= "";
-	int epoch_cntr		= 0;
-	int test_cntr		= 0;
+	string file_path		= "";
+	string interface		= "";
+	int epoch_cntr			= 0;
+	int empty_epoch_cntr	= 0;
 
 	shared_ptr<vector<shared_ptr<flow>>>		p_parse_result;
 	vector<shared_ptr<flow>>					parse_result;
@@ -39,6 +40,8 @@ private:
 	bool save_result_enable = false;
 	string save_result_name = "";
 	string save_result_path = "";
+	// Max time to wait for incoming packets before terminating.
+	long max_time			= 0;
 
 public:
 	void start_stream(void);

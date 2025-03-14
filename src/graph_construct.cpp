@@ -3,7 +3,9 @@
 using namespace hypervision;
 
 void traffic_graph::parse_short_edge(void) {
-	LOG("Parsing short edge.");
+	#ifdef DEBUG
+		LOG("Parsing short edge.");
+	#endif
 
 	if (p_short_edge == nullptr) {
 		FATAL_ERROR("The short edges not found.");
@@ -61,7 +63,9 @@ void traffic_graph::parse_short_edge(void) {
 }
 
 void traffic_graph::parse_long_edge(void) {
-	LOG("Parsing longlive edge.");
+	#ifdef DEBUG
+		LOG("Parsing longlive edge.");
+	#endif
 
 	for (size_t i = 0; i < p_long_edge->size(); ++i) {
 		const auto _edge		= p_long_edge->at(i);

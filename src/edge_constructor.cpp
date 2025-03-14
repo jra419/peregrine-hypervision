@@ -5,7 +5,9 @@ using namespace hypervision;
 void edge_constructor::flow_classification(flow_vec & short_flow_pvec, flow_vec &  long_flow_pvec) {
 	size_t sum_short	= 0;
 	size_t sum_long		= 0;
-	LOGF("Num pkts parse result (flow classif.): %lu", parse_result.size());
+	#ifdef DEBUG
+		LOGF("Num pkts parse result (flow classif.): %lu", parse_result.size());
+	#endif
 
 	for (const auto& p_f: parse_result) {
 		if (p_f->flow_long == 1) {
@@ -17,13 +19,13 @@ void edge_constructor::flow_classification(flow_vec & short_flow_pvec, flow_vec 
 		}
 	}
 
-	LOGF("Before aggregation: %ld short edges [%ld pkts], %ld long edges [%ld pkts].",
-		 short_flow_pvec.size(), sum_short, long_flow_pvec.size(), sum_long);
+	#ifdef DEBUG
+		LOGF("Before aggregation: %ld short edges [%ld pkts], %ld long edges [%ld pkts].",
+			short_flow_pvec.size(), sum_short, long_flow_pvec.size(), sum_long);
+	#endif
 }
 
 void edge_constructor::construct_long_flow(flow_vec & long_flow_pvec, size_t multiplex) {
-	__START_FTIMMER__
-
 	if (p_long_edges != nullptr) {
 		WARN("Long flow constructing results are detected.");
 	}
@@ -63,9 +65,6 @@ void edge_constructor::construct_long_flow(flow_vec & long_flow_pvec, size_t mul
 
 	for (auto & t : vt)
 		t.join();
-
-	__STOP_FTIMER__
-	__PRINTF_EXE_TIME__
 }
 
 void edge_constructor::construct_short_flow(flow_vec & short_flow_pvec) {

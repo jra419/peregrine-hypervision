@@ -34,54 +34,60 @@ void Hypervision::start_stream(void) {
 	interface = jin_main["packet_listen"]["interface"];
 	Listener p_listener(interface);
 
-	int empty_epoch_cntr = 0;
 
-	std::thread worker(&Hypervision::listener, this, std::ref(p_listener));
+	std::thread listener_thread(&Hypervision::listener, this, std::ref(p_listener));
+	auto last_ts = std::chrono::steady_clock::now();
 
 	while (true) {
-		sleep(20);
-		epoch_cntr++;
+		auto cur_ts         = std::chrono::steady_clock::now();
+		auto elapsed_time   = std::chrono::duration_cast<std::chrono::seconds>(cur_ts - last_ts);
 
-		if (sampl_vec.empty()) {
+		if (elapsed_time.count() > max_time) {
 			std::cout << "Epoch " << std::to_string(epoch_cntr)
 					  << ": No samples received." << std::endl;
-			empty_epoch_cntr++;
-			if (empty_epoch_cntr > 9) {
-				running = false;
-				worker.join();
-				break;
-			}
-			continue;
+			running = false;
+			listener_thread.join();
+			break;
 		} else {
-			std::cout << "Epoch " << std::to_string(epoch_cntr)
-					  << ": " << std::to_string(sampl_vec.size())
-					  << " Samples received." << std::endl;
-			std::cout << "test: " << std::to_string(test_cntr) << std::endl;
-			sampl_vec_cur = sampl_vec;
-			sampl_vec.clear();
-			test_cntr = 0;
-			empty_epoch_cntr = 0;
+			if (epoch_cntr >= 1000) {
+				std::cout << "Epoch " << std::to_string(epoch_cntr)
+						  << ": " << std::to_string(sampl_vec.size())
+						  << " Samples received." << std::endl;
+				sampl_vec_cur = sampl_vec;
+				sampl_vec.clear();
+
+				epoch_cntr	= 0;
+				last_ts		= cur_ts;
+			}
 		}
 
 		process_received_pkts();
 
-		LOGF("Split datasets.");
+		#ifdef DEBUG
+			LOGF("Split datasets.");
+		#endif
 		const auto p_dataset_constructor = make_shared<BasicDataset>(parse_result);
 		p_dataset_constructor->configure_via_json(jin_main["dataset_construct"]);
 		p_dataset_constructor->do_dataset_construct();
 		label = p_dataset_constructor->get_label();
 
-		LOGF("Construct edge.");
+		#ifdef DEBUG
+			LOGF("Construct edge.");
+		#endif
 		const auto p_edge_constructor = make_shared<edge_constructor>(parse_result);
 		p_edge_constructor->config_via_json(jin_main["edge_construct"]);
 		p_edge_constructor->do_construct();
 		tie(p_short_edges, p_long_edges) = p_edge_constructor->get_edge();
 
-		LOGF("Construct Graph.");
+		#ifdef DEBUG
+			LOGF("Construct Graph.");
+		#endif
 		const auto p_graph = make_shared<traffic_graph>(p_short_edges, p_long_edges);
 		p_graph->config_via_json(jin_main["graph_analyze"]);
 		p_graph->parse_edge();
-		LOGF("Graph Detect.");
+		#ifdef DEBUG
+			LOGF("Graph Detect.");
+		#endif
 		p_graph->graph_detect();
 		p_loss = p_graph->get_final_pkt_score(label);
 
@@ -433,14 +439,17 @@ std::pair<uint32_t, uint32_t> Hypervision::val_and_num(uint32_t b0, uint32_t b1,
 void Hypervision::listener(Listener& p_listener) {
 	while (running) {
 		auto p_sampl = p_listener.receive_sample();
-		test_cntr++;
-		sampl_vec.push_back(p_sampl);
+		if (p_sampl.valid) {
+			epoch_cntr++;
+			sampl_vec.push_back(p_sampl);
+		}
 	}
 }
 
 void Hypervision::config_via_json(const nlohmann::json& jin) {
 	try {
 		if (
+			jin.count("packet_listen") &&
 			jin.count("dataset_construct") &&
 			jin.count("flow_construct") &&
 			jin.count("edge_construct") &&
@@ -450,7 +459,12 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 			} else {
 				throw logic_error("Incomplete json configuration.");
 			}
-			const auto j_save = jin["result_save"];
+			const auto j_listen = jin["packet_listen"];
+			const auto j_save	= jin["result_save"];
+			if (j_listen.count("max_time")) {
+				save_result_enable =
+						static_cast<decltype(max_time)>(j_save["max_time"]);
+			}
 			if (j_save.count("save_result_enable")) {
 				save_result_enable =
 						static_cast<decltype(save_result_enable)>(j_save["save_result_enable"]);

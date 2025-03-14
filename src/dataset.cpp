@@ -23,7 +23,9 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 	size_t line = ceil(parse_result.size() * train_ratio);
 	parse_train.insert(parse_train.begin(), parse_result.begin(), parse_result.begin() + line);
 	parse_test.insert(parse_test.begin(), parse_result.begin(), parse_result.end());
-	LOGF("[Train set: %8ld packets]", parse_train.size());
+	#ifdef DEBUG
+		LOGF("[Train set: %8ld packets]", parse_train.size());
+	#endif
 
 	fill_n(back_inserter(label), parse_test.size(), false);
 
@@ -91,11 +93,13 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 		t.join();
 
 	size_t num_malicious = count(label.begin(), label.end(), true);
-	LOGF("[test  set: %8ld packets]", parse_test.size());
-	LOGF("[%8ld benign (%4.2lf%%), %8ld malicious (%4.2lf%%)]",
-		 parse_test.size() - num_malicious,
-		 100.0 * (parse_test.size() - num_malicious) /  parse_test.size(),
-		 num_malicious, 100.0 * (num_malicious) /  parse_test.size());
+	#ifdef DEBUG
+		LOGF("[test  set: %8ld packets]", parse_test.size());
+		LOGF("[%8ld benign (%4.2lf%%), %8ld malicious (%4.2lf%%)]",
+			parse_test.size() - num_malicious,
+			100.0 * (parse_test.size() - num_malicious) /  parse_test.size(),
+			num_malicious, 100.0 * (num_malicious) /  parse_test.size());
+	#endif
 }
 
 void BasicDataset::configure_via_json(const nlohmann::json & jin) {

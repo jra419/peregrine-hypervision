@@ -45,8 +45,10 @@ public:
 		// Long flow feat. distrib. fitting
 		construct_short_flow(short_flow_pvec);
 
-		LOGF("After aggregation: %ld short edges [%ld pkts], %ld long edges [%ld pkts].",
-			p_short_edges->size(), short_packet_sum, p_long_edges->size(), long_packet_sum);
+		#ifdef DEBUG
+			LOGF("After aggregation: %ld short edges [%ld pkts], %ld long edges [%ld pkts].",
+				p_short_edges->size(), short_packet_sum, p_long_edges->size(), long_packet_sum);
+		#endif
 	}
 
 	void dump_long_edge(void) const {

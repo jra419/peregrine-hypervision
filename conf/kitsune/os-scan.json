@@ -1,6 +1,7 @@
 {
     "packet_listen": {
-        "interface": "veth3"
+        "interface": "veth3",
+		"max_time": "120"
     },
     "dataset_construct": {
         "attacker_src4": ["169.254.174.17"]
@@ -39,6 +40,6 @@
     "result_save": {
         "save_result_enable": true,
         "save_result_name": "os-scan",
-        "save_result_path": "tmp/kitsune/os-scan"
+        "save_result_path": "eval/data/kitsune/os-scan"
     }
 }

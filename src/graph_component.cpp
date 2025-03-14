@@ -3,7 +3,9 @@
 using namespace hypervision;
 
 auto traffic_graph::connected_component() const -> shared_ptr<component> {
-	LOGF("Detect strong connected components.");
+	#ifdef DEBUG
+		LOGF("Detect strong connected components.");
+	#endif
 
 	vector<addr_t> _vertex_reverse;
 	set_union(vertex_set_long.cbegin(),
@@ -247,7 +249,6 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 			for (size_t i = 0; i < x_len; i ++) {
 				for (size_t j = 0; j < y_len; j ++) {
 					mxt(j, i) = mx[i][j];
-					cout << "mx [" << i << "," << j << "] = " << mx[i][j] << endl;
 				}
 			}
 			return mxt;
@@ -272,10 +273,8 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 	const auto __get_loss_cp = [&centroids_cp] (const decltype(cp_f_mat.col(0)) & _vec) -> double_t {
 		double_t res = HUG;
 		mlpack::metric::EuclideanDistance euclidean_eval;
-		cout << "centroids_cp.ncols: " << centroids_cp.n_cols << endl;
 		for (size_t i = 0; i < centroids_cp.n_cols; i ++) {
 			res = min(res, euclidean_eval.Evaluate(centroids_cp.col(i), _vec) );
-			cout << "res " << i << ": " << res << endl;
 		}
 		return res;
 	};
@@ -307,7 +306,9 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 			_f_disp_selected_component(selected_index);
 		#endif
 	}
-	LOGF("Select %ld components from %ld.", res_ptr->size(), loss_vec.size());
+	#ifdef DEBUG
+		LOGF("Select %ld components from %ld.", res_ptr->size(), loss_vec.size());
+	#endif
 
 	return res_ptr;
 }
