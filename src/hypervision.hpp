@@ -25,6 +25,8 @@ private:
 	string file_path		= "";
 	string interface		= "";
 	int epoch_cntr			= 0;
+	int cur_cntr			= 0;
+	int cur_epoch			= 0;
 	int empty_epoch_cntr	= 0;
 
 	shared_ptr<vector<shared_ptr<flow>>>		p_parse_result;

@@ -2,5 +2,7 @@
 build/
 cmake/
 eval/
+conf/*/
+!conf/*
 
 compile_commands.json

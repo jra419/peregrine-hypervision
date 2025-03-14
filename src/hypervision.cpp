@@ -49,14 +49,15 @@ void Hypervision::start_stream(void) {
 			listener_thread.join();
 			break;
 		} else {
-			if (epoch_cntr >= 1000) {
-				std::cout << "Epoch " << std::to_string(epoch_cntr)
+			if (cur_cntr >= epoch_cntr) {
+				std::cout << "Epoch " << std::to_string(cur_epoch)
 						  << ": " << std::to_string(sampl_vec.size())
 						  << " Samples received." << std::endl;
 				sampl_vec_cur = sampl_vec;
 				sampl_vec.clear();
+				cur_epoch++;
 
-				epoch_cntr	= 0;
+				cur_cntr	= 0;
 				last_ts		= cur_ts;
 			}
 		}
@@ -440,7 +441,7 @@ void Hypervision::listener(Listener& p_listener) {
 	while (running) {
 		auto p_sampl = p_listener.receive_sample();
 		if (p_sampl.valid) {
-			epoch_cntr++;
+			cur_cntr++;
 			sampl_vec.push_back(p_sampl);
 		}
 	}
@@ -464,6 +465,10 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 			if (j_listen.count("max_time")) {
 				save_result_enable =
 						static_cast<decltype(max_time)>(j_save["max_time"]);
+			}
+			if (j_listen.count("epoch_cntr")) {
+				save_result_enable =
+						static_cast<decltype(epoch_cntr)>(j_save["epoch_cntr"]);
 			}
 			if (j_save.count("save_result_enable")) {
 				save_result_enable =
