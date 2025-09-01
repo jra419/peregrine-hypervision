@@ -58,23 +58,10 @@ sample_t Listener::receive_sample() {
 				 (struct sockaddr *)&saddr, (socklen_t *)&saddr_size);
 
 	if (data_size < 0) {
-		printf("Recvfrom error, failed to get packets.\n");
-		exit(1);
-	} else if (data_size < 112) {
-		#ifdef DEBUG
-			std::cout << data_size << std::endl;
-			printf("Error: received packet is too small.\n");
-		#endif
+		printf("Error: Recvfrom failed to get packets.\n");
 	}
 
 	auto pkt = (pkt_hdr_t *)(buffer);
-
-	#ifdef DEBUG
-		pkt->print_hdr_base();
-		pkt->print_peregrine_hdr();
-		pkt->print_peregrine_bin_len_hdr();
-		pkt->print_peregrine_bin_ts_hdr();
-	#endif
 
 	return sample_t(pkt, data_size);
 }

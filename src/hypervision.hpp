@@ -24,10 +24,17 @@ private:
 	nlohmann::json jin_main;
 	string file_path		= "";
 	string interface		= "";
+	string trace			= "";
+	string dataset			= "";
+	bool hv_dataset			= false;
 	int epoch_cntr			= 0;
 	int cur_cntr			= 0;
 	int cur_epoch			= 0;
 	int empty_epoch_cntr	= 0;
+	int pkt_cnt_global		= 0;
+	int trace_index			= 0;
+
+	std::chrono::time_point<std::chrono::steady_clock> cur_ts, last_ts;
 
 	shared_ptr<vector<shared_ptr<flow>>>		p_parse_result;
 	vector<shared_ptr<flow>>					parse_result;
@@ -46,7 +53,9 @@ private:
 	long max_time			= 0;
 
 public:
-	void start_stream(void);
+	void stream_dp(void);
+	void stream_cp(void);
+	void stream_graph(void);
 	void process_received_pkts(void);
 
 	template<typename... Args>

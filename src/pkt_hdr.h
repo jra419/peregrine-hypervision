@@ -63,141 +63,66 @@ struct icmp_hdr_t {
 	uint16_t checksum;
 } __attribute__((packed));
 
-struct peregrine_hdr_t {
-	uint32_t ts_start_0;
-	uint32_t ts_end_0;
-	uint32_t ts_agg_0;
-	uint32_t ip_src_0;
-	uint32_t ip_dst_0;
-	uint32_t proto_0;
-	uint32_t ports_0;
-	uint32_t syn_ack_0;
-	uint32_t fin_rst_0;
-	uint32_t cnt_0;
-	uint32_t len_0;
-	uint8_t  long_0;
-	uint32_t ts_start_1;
-	uint32_t ts_end_1;
-	uint32_t ts_agg_1;
-	uint32_t ip_src_1;
-	uint32_t ip_dst_1;
-	uint32_t proto_1;
-	uint32_t ports_1;
-	uint32_t syn_ack_1;
-	uint32_t fin_rst_1;
-	uint32_t cnt_1;
-	uint32_t len_1;
-	uint8_t  long_1;
-	uint32_t ts_start_2;
-	uint32_t ts_end_2;
-	uint32_t ts_agg_2;
-	uint32_t ip_src_2;
-	uint32_t ip_dst_2;
-	uint32_t proto_2;
-	uint32_t ports_2;
-	uint32_t syn_ack_2;
-	uint32_t fin_rst_2;
-	uint32_t cnt_2;
-	uint32_t len_2;
-	uint8_t  long_2;
-	uint32_t ts_start_3;
-	uint32_t ts_end_3;
-	uint32_t ts_agg_3;
-	uint32_t ip_src_3;
-	uint32_t ip_dst_3;
-	uint32_t proto_3;
-	uint32_t ports_3;
-	uint32_t syn_ack_3;
-	uint32_t fin_rst_3;
-	uint32_t cnt_3;
-	uint32_t len_3;
-	uint8_t  long_3;
+// 424 bits / 53 bytes
+struct hv_hdr_t {
+	uint32_t ts_start;
+	uint32_t ts_end;
+	uint32_t ts_agg;
+	uint32_t ip_src;
+	uint32_t ip_dst;
+	uint32_t proto;
+	uint32_t ports;
+	uint32_t syn;
+	uint32_t ack;
+	uint32_t fin;
+	uint32_t rst;
+	uint32_t cnt;
+	uint32_t len;
+	uint8_t  flow_long;
 } __attribute__((packed));
 
-struct peregrine_bin_len_hdr_t {
-	uint32_t bin_0_0_a;
-	uint32_t bin_0_0_b;
-	uint32_t bin_0_1_a;
-	uint32_t bin_0_1_b;
-	uint32_t bin_0_2_a;
-	uint32_t bin_0_2_b;
-	uint32_t bin_0_3_a;
-	uint32_t bin_0_3_b;
-	uint32_t bin_1_0_a;
-	uint32_t bin_1_0_b;
-	uint32_t bin_1_1_a;
-	uint32_t bin_1_1_b;
-	uint32_t bin_1_2_a;
-	uint32_t bin_1_2_b;
-	uint32_t bin_1_3_a;
-	uint32_t bin_1_3_b;
-	uint32_t bin_2_0_a;
-	uint32_t bin_2_0_b;
-	uint32_t bin_2_1_a;
-	uint32_t bin_2_1_b;
-	uint32_t bin_2_2_a;
-	uint32_t bin_2_2_b;
-	uint32_t bin_2_3_a;
-	uint32_t bin_2_3_b;
-	uint32_t bin_3_0_a;
-	uint32_t bin_3_0_b;
-	uint32_t bin_3_1_a;
-	uint32_t bin_3_1_b;
-	uint32_t bin_3_2_a;
-	uint32_t bin_3_2_b;
-	uint32_t bin_3_3_a;
-	uint32_t bin_3_3_b;
-	uint32_t bin_4_0_a;
-	uint32_t bin_4_0_b;
-	uint32_t bin_4_1_a;
-	uint32_t bin_4_1_b;
-	uint32_t bin_4_2_a;
-	uint32_t bin_4_2_b;
-	uint32_t bin_4_3_a;
-	uint32_t bin_4_3_b;
-} __attribute__((packed));
-
-struct peregrine_bin_ts_hdr_t {
-	uint32_t bin_0_0_a;
-	uint32_t bin_0_0_b;
-	uint32_t bin_0_1_a;
-	uint32_t bin_0_1_b;
-	uint32_t bin_0_2_a;
-	uint32_t bin_0_2_b;
-	uint32_t bin_0_3_a;
-	uint32_t bin_0_3_b;
-	uint32_t bin_1_0_a;
-	uint32_t bin_1_0_b;
-	uint32_t bin_1_1_a;
-	uint32_t bin_1_1_b;
-	uint32_t bin_1_2_a;
-	uint32_t bin_1_2_b;
-	uint32_t bin_1_3_a;
-	uint32_t bin_1_3_b;
-	uint32_t bin_2_0_a;
-	uint32_t bin_2_0_b;
-	uint32_t bin_2_1_a;
-	uint32_t bin_2_1_b;
-	uint32_t bin_2_2_a;
-	uint32_t bin_2_2_b;
-	uint32_t bin_2_3_a;
-	uint32_t bin_2_3_b;
-	uint32_t bin_3_0_a;
-	uint32_t bin_3_0_b;
-	uint32_t bin_3_1_a;
-	uint32_t bin_3_1_b;
-	uint32_t bin_3_2_a;
-	uint32_t bin_3_2_b;
-	uint32_t bin_3_3_a;
-	uint32_t bin_3_3_b;
-	uint32_t bin_4_0_a;
-	uint32_t bin_4_0_b;
-	uint32_t bin_4_1_a;
-	uint32_t bin_4_1_b;
-	uint32_t bin_4_2_a;
-	uint32_t bin_4_2_b;
-	uint32_t bin_4_3_a;
-	uint32_t bin_4_3_b;
+// 1280 bits / 160 bytes
+struct hv_bin_hdr_t {
+	uint32_t a_0_0;
+	uint32_t b_0_0;
+	uint32_t a_0_1;
+	uint32_t b_0_1;
+	uint32_t a_0_2;
+	uint32_t b_0_2;
+	uint32_t a_0_3;
+	uint32_t b_0_3;
+	uint32_t a_1_0;
+	uint32_t b_1_0;
+	uint32_t a_1_1;
+	uint32_t b_1_1;
+	uint32_t a_1_2;
+	uint32_t b_1_2;
+	uint32_t a_1_3;
+	uint32_t b_1_3;
+	uint32_t a_2_0;
+	uint32_t b_2_0;
+	uint32_t a_2_1;
+	uint32_t b_2_1;
+	uint32_t a_2_2;
+	uint32_t b_2_2;
+	uint32_t a_2_3;
+	uint32_t b_2_3;
+	uint32_t a_3_0;
+	uint32_t b_3_0;
+	uint32_t a_3_1;
+	uint32_t b_3_1;
+	uint32_t a_3_2;
+	uint32_t b_3_2;
+	uint32_t a_3_3;
+	uint32_t b_3_3;
+	uint32_t a_4_0;
+	uint32_t b_4_0;
+	uint32_t a_4_1;
+	uint32_t b_4_1;
+	uint32_t a_4_2;
+	uint32_t b_4_2;
+	uint32_t a_4_3;
+	uint32_t b_4_3;
 } __attribute__((packed));
 
 struct pkt_hdr_t {
@@ -208,16 +133,17 @@ struct pkt_hdr_t {
 	size_t get_l2_size() const { return sizeof(eth_hdr_t); }
 
 	ipv4_hdr_t* get_l3() const {
-		auto l2_hdr = get_l2();
-		auto l2_hdr_size = get_l2_size();
+		auto l2_hdr			= get_l2();
+		auto l2_hdr_size	= get_l2_size();
+
 		return (ipv4_hdr_t*)((uint8_t*)l2_hdr + l2_hdr_size);
 	}
 
 	size_t get_l3_size() const { return sizeof(ipv4_hdr_t); }
 
 	std::pair<void*, uint16_t> get_l4() const {
-		auto ip_hdr = get_l3();
-		auto ip_size = get_l3_size();
+		auto ip_hdr		= get_l3();
+		auto ip_size	= get_l3_size();
 
 		switch (ip_hdr->protocol) {
 			case IP_PROTO_TCP: {
@@ -230,7 +156,7 @@ struct pkt_hdr_t {
 				return std::pair<void*, uint16_t>((uint8_t*)ip_hdr + ip_size, IP_PROTO_ICMP);
 			} break;
 			default: {
-				printf("\n*** Not TCP/UDP/ICMP packet! ***\n");
+				printf("\nError: Not a TCP/UDP/ICMP packet!\n");
 				exit(1);
 			} break;
 		}
@@ -238,6 +164,7 @@ struct pkt_hdr_t {
 
 	bool has_valid_protocol() const {
 		auto ip_hdr = get_l3();
+
 		return (ip_hdr->protocol == IP_PROTO_TCP ||
 				ip_hdr->protocol == IP_PROTO_UDP ||
 				ip_hdr->protocol == IP_PROTO_ICMP);
@@ -247,78 +174,91 @@ struct pkt_hdr_t {
 		auto ip_hdr = get_l3();
 
 		switch (ip_hdr->protocol) {
-			case IP_PROTO_TCP: { return sizeof(tcp_hdr_t); } break;
-			case IP_PROTO_UDP: { return sizeof(udp_hdr_t); } break;
-			case IP_PROTO_ICMP: { return sizeof(icmp_hdr_t); } break;
-			default: { return 0; } break;
+			case IP_PROTO_TCP: {
+				return sizeof(tcp_hdr_t);
+			} break;
+			case IP_PROTO_UDP: {
+				return sizeof(udp_hdr_t);
+			} break;
+			case IP_PROTO_ICMP: {
+				return sizeof(icmp_hdr_t);
+			} break;
+			default: {
+				return 0;
+			} break;
 		}
 	}
 
-	size_t get_peregrine_hdr_size() const {
-		return sizeof(peregrine_hdr_t);
+	size_t get_hv_hdr_size() const {
+		return sizeof(hv_hdr_t);
 	}
 
-	peregrine_hdr_t* get_peregrine_hdr() const {
-		auto l4_hdr = get_l4();
-		auto l4_hdr_size = get_l4_size();
+	hv_hdr_t* get_hv_0_hdr() const {
+		auto l4_hdr			= get_l4();
+		auto l4_hdr_size	= get_l4_size();
 
 		if (l4_hdr_size == 0) {
 			printf(
-				"\n*** Not a TCP/UDP/ICMP packet! Can't extract the Peregrine header. ***\n");
+				"\nError: Not a TCP/UDP/ICMP packet! Can't extract the hv 0 header.\n");
 			exit(1);
 		}
 
-		auto peregrine_hdr = (uint8_t*)l4_hdr.first + l4_hdr_size;
-		return static_cast<peregrine_hdr_t*>((void*)peregrine_hdr);
+		auto hv_0_hdr = (uint8_t*)l4_hdr.first + l4_hdr_size;
+
+		return static_cast<hv_hdr_t*>((void*)hv_0_hdr);
 	}
 
-	size_t get_peregrine_bin_len_hdr_size() const {
-		return sizeof(peregrine_bin_len_hdr_t);
+	hv_hdr_t* get_hv_1_hdr() const {
+		auto hv_0_hdr	= get_hv_0_hdr();
+		auto hv_1_hdr	= (uint8_t*)hv_0_hdr + sizeof(hv_hdr_t);
+
+		return static_cast<hv_hdr_t*>((void*)hv_1_hdr);
 	}
 
-	peregrine_bin_len_hdr_t* get_peregrine_bin_len_hdr() const {
-		auto peregrine_hdr = get_peregrine_hdr();
-		auto peregrine_hdr_size = get_peregrine_hdr_size();
+	hv_hdr_t* get_hv_2_hdr() const {
+		auto hv_1_hdr	= get_hv_1_hdr();
+		auto hv_2_hdr	= (uint8_t*)hv_1_hdr + sizeof(hv_hdr_t);
 
-		if (peregrine_hdr_size == 0) {
-			printf("\n*** Not a peregrine hdr packet! Can't extract the bin len header. ***\n");
-			exit(1);
-		}
-
-		auto peregrine_bin_len_hdr = (uint8_t*)peregrine_hdr + peregrine_hdr_size;
-		return static_cast<peregrine_bin_len_hdr_t*>((void*)peregrine_bin_len_hdr);
+		return static_cast<hv_hdr_t*>((void*)hv_2_hdr);
 	}
 
-	size_t get_peregrine_bin_ts_hdr_size() const {
-		return sizeof(peregrine_bin_ts_hdr_t);
+	hv_hdr_t* get_hv_3_hdr() const {
+		auto hv_2_hdr	= get_hv_2_hdr();
+		auto hv_3_hdr	= (uint8_t*)hv_2_hdr + sizeof(hv_hdr_t);
+
+		return static_cast<hv_hdr_t*>((void*)hv_3_hdr);
 	}
 
-	peregrine_bin_ts_hdr_t* get_peregrine_bin_ts_hdr() const {
-		auto peregrine_bin_len_hdr = get_peregrine_bin_len_hdr();
-		auto peregrine_bin_len_hdr_size = get_peregrine_bin_len_hdr_size();
+	size_t get_hv_bin_hdr_size() const {
+		return sizeof(hv_bin_hdr_t);
+	}
 
-		if (peregrine_bin_len_hdr_size == 0) {
-			printf("\n*** Not a peregrine bin len hdr packet!\
-					Can't extract the bin ts header. ***\n");
-			exit(1);
-		}
+	hv_bin_hdr_t* get_hv_bin_len_hdr() const {
+		auto hv_3_hdr		= get_hv_3_hdr();
+		auto hv_bin_len_hdr = (uint8_t*)hv_3_hdr + sizeof(hv_hdr_t);
 
-		auto peregrine_bin_ts_hdr = (uint8_t*)peregrine_bin_len_hdr + peregrine_bin_len_hdr_size;
-		return static_cast<peregrine_bin_ts_hdr_t*>((void*)peregrine_bin_ts_hdr);
+		return static_cast<hv_bin_hdr_t*>((void*)hv_bin_len_hdr);
+	}
+
+	hv_bin_hdr_t* get_hv_bin_ts_hdr() const {
+		auto hv_bin_len_hdr = get_hv_bin_len_hdr();
+		auto hv_bin_ts_hdr	= (uint8_t*)hv_bin_len_hdr + sizeof(hv_bin_hdr_t);
+
+		return static_cast<hv_bin_hdr_t*>((void*)hv_bin_ts_hdr);
 	}
 
 	void print_hdr_base() {
-		auto eth_hdr = get_l2();
-		auto ip_hdr = get_l3();
-		auto l4_hdr = get_l4();
+		auto eth_hdr	= get_l2();
+		auto ip_hdr		= get_l3();
+		auto l4_hdr		= get_l4();
 
 		printf("### Ethernet ###\n");
-		printf("# src	%02x:%02x:%02x:%02x:%02x:%02x\n", eth_hdr->src_mac[0],
-			   eth_hdr->src_mac[1], eth_hdr->src_mac[2], eth_hdr->src_mac[3],
-			   eth_hdr->src_mac[4], eth_hdr->src_mac[5]);
-		printf("# dst	%02x:%02x:%02x:%02x:%02x:%02x\n", eth_hdr->dst_mac[0],
-			   eth_hdr->dst_mac[1], eth_hdr->dst_mac[2], eth_hdr->dst_mac[3],
-			   eth_hdr->dst_mac[4], eth_hdr->dst_mac[5]);
+		printf("# src	%02x:%02x:%02x:%02x:%02x:%02x\n",
+				eth_hdr->src_mac[0], eth_hdr->src_mac[1], eth_hdr->src_mac[2],
+				eth_hdr->src_mac[3], eth_hdr->src_mac[4], eth_hdr->src_mac[5]);
+		printf("# dst	%02x:%02x:%02x:%02x:%02x:%02x\n",
+				eth_hdr->dst_mac[0], eth_hdr->dst_mac[1], eth_hdr->dst_mac[2],
+				eth_hdr->dst_mac[3], eth_hdr->dst_mac[4], eth_hdr->dst_mac[5]);
 		printf("# type	0x%x\n", ntohs(eth_hdr->eth_type));
 
 		printf("### IP ###\n");
@@ -331,12 +271,12 @@ struct pkt_hdr_t {
 		printf("# ttl		%u\n", ip_hdr->ttl);
 		printf("# proto		%u\n", ip_hdr->protocol);
 		printf("# chksum	0x%x\n", ntohs(ip_hdr->check));
-		printf("# src		%u.%u.%u.%u\n", (ip_hdr->src_ip >> 0) & 0xff,
-			   (ip_hdr->src_ip >> 8) & 0xff, (ip_hdr->src_ip >> 16) & 0xff,
-			   (ip_hdr->src_ip >> 24) & 0xff);
-		printf("# dst		%u.%u.%u.%u\n", (ip_hdr->dst_ip >> 0) & 0xff,
-			   (ip_hdr->dst_ip >> 8) & 0xff, (ip_hdr->dst_ip >> 16) & 0xff,
-			   (ip_hdr->dst_ip >> 24) & 0xff);
+		printf("# src		%u.%u.%u.%u\n",
+				(ip_hdr->src_ip >> 0) & 0xff, (ip_hdr->src_ip >> 8) & 0xff,
+				(ip_hdr->src_ip >> 16) & 0xff, (ip_hdr->src_ip >> 24) & 0xff);
+		printf("# dst		%u.%u.%u.%u\n",
+				(ip_hdr->dst_ip >> 0) & 0xff, (ip_hdr->dst_ip >> 8) & 0xff,
+				(ip_hdr->dst_ip >> 16) & 0xff, (ip_hdr->dst_ip >> 24) & 0xff);
 
 		switch (l4_hdr.second) {
 			case IP_PROTO_TCP: {
@@ -363,188 +303,205 @@ struct pkt_hdr_t {
 		}
 	}
 
-	void print_peregrine_hdr() {
+	void print_hv_hdrs() {
 		if (!has_valid_protocol()) { return; }
 
-		auto peregrine_hdr = get_peregrine_hdr();
+		auto hv_0_hdr = get_hv_0_hdr();
+		auto hv_1_hdr = get_hv_0_hdr();
+		auto hv_2_hdr = get_hv_0_hdr();
+		auto hv_3_hdr = get_hv_0_hdr();
 
-		printf("### Peregrine ###\n");
-		printf("# ts_start_0	%u\n", ntohl(peregrine_hdr->ts_start_0));
-		printf("# ts_end_0		%u\n", ntohl(peregrine_hdr->ts_end_0));
-		printf("# ts_agg_0		%u\n", ntohl(peregrine_hdr->ts_agg_0));
-		printf("# ip_src_0		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_src_0 >> 0) & 0xff,
-			   (peregrine_hdr->ip_src_0 >> 8) & 0xff,
-			   (peregrine_hdr->ip_src_0 >> 16) & 0xff,
-			   (peregrine_hdr->ip_src_0 >> 24) & 0xff);
-		printf("# ip_dst_0		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_dst_0 >> 0) & 0xff,
-			   (peregrine_hdr->ip_dst_0 >> 8) & 0xff,
-			   (peregrine_hdr->ip_dst_0 >> 16) & 0xff,
-			   (peregrine_hdr->ip_dst_0 >> 24) & 0xff);
-		printf("# proto_0		%u\n", ntohl(peregrine_hdr->proto_0));
-		printf("# ports_0		%u\n", ntohl(peregrine_hdr->ports_0));
-		printf("# syn_ack_0		%u\n", ntohl(peregrine_hdr->syn_ack_0));
-		printf("# fin_rst_0		%u\n", ntohl(peregrine_hdr->fin_rst_0));
-		printf("# cnt_0			%u\n", ntohl(peregrine_hdr->cnt_0));
-		printf("# len_0			%u\n", ntohl(peregrine_hdr->len_0));
-		printf("# long_0		%u\n", ntohl(peregrine_hdr->long_0));
-		printf("# ts_start_1	%u\n", ntohl(peregrine_hdr->ts_start_1));
-		printf("# ts_end_1		%u\n", ntohl(peregrine_hdr->ts_end_1));
-		printf("# ts_agg_1		%u\n", ntohl(peregrine_hdr->ts_agg_1));
-		printf("# ip_src_1		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_src_1 >> 0) & 0xff,
-			   (peregrine_hdr->ip_src_1 >> 8) & 0xff,
-			   (peregrine_hdr->ip_src_1 >> 16) & 0xff,
-			   (peregrine_hdr->ip_src_1 >> 24) & 0xff);
-		printf("# ip_dst_1		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_dst_1 >> 0) & 0xff,
-			   (peregrine_hdr->ip_dst_1 >> 8) & 0xff,
-			   (peregrine_hdr->ip_dst_1 >> 16) & 0xff,
-			   (peregrine_hdr->ip_dst_1 >> 24) & 0xff);
-		printf("# proto_1		%u\n", ntohl(peregrine_hdr->proto_1));
-		printf("# ports_1		%u\n", ntohl(peregrine_hdr->ports_1));
-		printf("# syn_ack_1		%u\n", ntohl(peregrine_hdr->syn_ack_1));
-		printf("# fin_rst_1		%u\n", ntohl(peregrine_hdr->fin_rst_1));
-		printf("# cnt_1			%u\n", ntohl(peregrine_hdr->cnt_1));
-		printf("# len_1			%u\n", ntohl(peregrine_hdr->len_1));
-		printf("# long_1		%u\n", ntohl(peregrine_hdr->long_1));
-		printf("# ts_start_2	%u\n", ntohl(peregrine_hdr->ts_start_2));
-		printf("# ts_end_2		%u\n", ntohl(peregrine_hdr->ts_end_2));
-		printf("# ts_agg_2		%u\n", ntohl(peregrine_hdr->ts_agg_2));
-		printf("# ip_src_2		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_src_2 >> 0) & 0xff,
-			   (peregrine_hdr->ip_src_2 >> 8) & 0xff,
-			   (peregrine_hdr->ip_src_2 >> 16) & 0xff,
-			   (peregrine_hdr->ip_src_2 >> 24) & 0xff);
-		printf("# ip_dst_2		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_dst_2 >> 0) & 0xff,
-			   (peregrine_hdr->ip_dst_2 >> 8) & 0xff,
-			   (peregrine_hdr->ip_dst_2 >> 16) & 0xff,
-			   (peregrine_hdr->ip_dst_2 >> 24) & 0xff);
-		printf("# proto_2		%u\n", ntohl(peregrine_hdr->proto_2));
-		printf("# ports_2		%u\n", ntohl(peregrine_hdr->ports_2));
-		printf("# syn_ack_2		%u\n", ntohl(peregrine_hdr->syn_ack_2));
-		printf("# fin_rst_2		%u\n", ntohl(peregrine_hdr->fin_rst_2));
-		printf("# cnt_2			%u\n", ntohl(peregrine_hdr->cnt_2));
-		printf("# len_2			%u\n", ntohl(peregrine_hdr->len_2));
-		printf("# long_2		%u\n", ntohl(peregrine_hdr->long_2));
-		printf("# ts_start_3	%u\n", ntohl(peregrine_hdr->ts_start_3));
-		printf("# ts_end_3		%u\n", ntohl(peregrine_hdr->ts_end_3));
-		printf("# ts_agg_3		%u\n", ntohl(peregrine_hdr->ts_agg_3));
-		printf("# ip_src_3		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_src_3 >> 0) & 0xff,
-			   (peregrine_hdr->ip_src_3 >> 8) & 0xff,
-			   (peregrine_hdr->ip_src_3 >> 16) & 0xff,
-			   (peregrine_hdr->ip_src_3 >> 24) & 0xff);
-		printf("# ip_dst_3		%u.%u.%u.%u\n",
-			   (peregrine_hdr->ip_dst_3 >> 0) & 0xff,
-			   (peregrine_hdr->ip_dst_3 >> 8) & 0xff,
-			   (peregrine_hdr->ip_dst_3 >> 16) & 0xff,
-			   (peregrine_hdr->ip_dst_3 >> 24) & 0xff);
-		printf("# proto_3		%u\n", ntohl(peregrine_hdr->proto_3));
-		printf("# ports_3		%u\n", ntohl(peregrine_hdr->ports_3));
-		printf("# syn_ack_3		%u\n", ntohl(peregrine_hdr->syn_ack_3));
-		printf("# fin_rst_3		%u\n", ntohl(peregrine_hdr->fin_rst_3));
-		printf("# cnt_3			%u\n", ntohl(peregrine_hdr->cnt_3));
-		printf("# len_3			%u\n", ntohl(peregrine_hdr->len_3));
-		printf("# long_3		%u\n", ntohl(peregrine_hdr->long_3));
+		printf("### hv 0 ###\n");
+		printf("# ts_start	%u\n", ntohl(hv_0_hdr->ts_start));
+		printf("# ts_end	%u\n", ntohl(hv_0_hdr->ts_end));
+		printf("# ts_agg	%u\n", ntohl(hv_0_hdr->ts_agg));
+		printf("# ip_src	%u.%u.%u.%u\n",
+			   (hv_0_hdr->ip_src >> 0) & 0xff,
+			   (hv_0_hdr->ip_src >> 8) & 0xff,
+			   (hv_0_hdr->ip_src >> 16) & 0xff,
+			   (hv_0_hdr->ip_src >> 24) & 0xff);
+		printf("# ip_dst	%u.%u.%u.%u\n",
+			   (hv_0_hdr->ip_dst >> 0) & 0xff,
+			   (hv_0_hdr->ip_dst >> 8) & 0xff,
+			   (hv_0_hdr->ip_dst >> 16) & 0xff,
+			   (hv_0_hdr->ip_dst >> 24) & 0xff);
+		printf("# proto		%u\n", ntohl(hv_0_hdr->proto));
+		printf("# ports		%u\n", ntohl(hv_0_hdr->ports));
+		printf("# syn		%u\n", ntohl(hv_0_hdr->syn));
+		printf("# ack		%u\n", ntohl(hv_0_hdr->ack));
+		printf("# fin		%u\n", ntohl(hv_0_hdr->fin));
+		printf("# rst		%u\n", ntohl(hv_0_hdr->rst));
+		printf("# cnt		%u\n", ntohl(hv_0_hdr->cnt));
+		printf("# len		%u\n", ntohl(hv_0_hdr->len));
+		printf("# long		%u\n", ntohl(hv_0_hdr->flow_long));
+
+		printf("### hv 1 ###\n");
+		printf("# ts_start	%u\n", ntohl(hv_1_hdr->ts_start));
+		printf("# ts_end	%u\n", ntohl(hv_1_hdr->ts_end));
+		printf("# ts_agg	%u\n", ntohl(hv_1_hdr->ts_agg));
+		printf("# ip_src	%u.%u.%u.%u\n",
+			   (hv_1_hdr->ip_src >> 0) & 0xff,
+			   (hv_1_hdr->ip_src >> 8) & 0xff,
+			   (hv_1_hdr->ip_src >> 16) & 0xff,
+			   (hv_1_hdr->ip_src >> 24) & 0xff);
+		printf("# ip_dst	%u.%u.%u.%u\n",
+			   (hv_1_hdr->ip_dst >> 0) & 0xff,
+			   (hv_1_hdr->ip_dst >> 8) & 0xff,
+			   (hv_1_hdr->ip_dst >> 16) & 0xff,
+			   (hv_1_hdr->ip_dst >> 24) & 0xff);
+		printf("# proto		%u\n", ntohl(hv_1_hdr->proto));
+		printf("# ports		%u\n", ntohl(hv_1_hdr->ports));
+		printf("# syn		%u\n", ntohl(hv_1_hdr->syn));
+		printf("# ack		%u\n", ntohl(hv_1_hdr->ack));
+		printf("# fin		%u\n", ntohl(hv_1_hdr->fin));
+		printf("# rst		%u\n", ntohl(hv_1_hdr->rst));
+		printf("# cnt		%u\n", ntohl(hv_1_hdr->cnt));
+		printf("# len		%u\n", ntohl(hv_1_hdr->len));
+		printf("# long		%u\n", ntohl(hv_1_hdr->flow_long));
+
+		printf("### hv 2 ###\n");
+		printf("# ts_start	%u\n", ntohl(hv_2_hdr->ts_start));
+		printf("# ts_end	%u\n", ntohl(hv_2_hdr->ts_end));
+		printf("# ts_agg	%u\n", ntohl(hv_2_hdr->ts_agg));
+		printf("# ip_src	%u.%u.%u.%u\n",
+			   (hv_2_hdr->ip_src >> 0) & 0xff,
+			   (hv_2_hdr->ip_src >> 8) & 0xff,
+			   (hv_2_hdr->ip_src >> 16) & 0xff,
+			   (hv_2_hdr->ip_src >> 24) & 0xff);
+		printf("# ip_dst	%u.%u.%u.%u\n",
+			   (hv_2_hdr->ip_dst >> 0) & 0xff,
+			   (hv_2_hdr->ip_dst >> 8) & 0xff,
+			   (hv_2_hdr->ip_dst >> 16) & 0xff,
+			   (hv_2_hdr->ip_dst >> 24) & 0xff);
+		printf("# proto		%u\n", ntohl(hv_2_hdr->proto));
+		printf("# ports		%u\n", ntohl(hv_2_hdr->ports));
+		printf("# syn		%u\n", ntohl(hv_2_hdr->syn));
+		printf("# ack		%u\n", ntohl(hv_2_hdr->ack));
+		printf("# fin		%u\n", ntohl(hv_2_hdr->fin));
+		printf("# rst		%u\n", ntohl(hv_2_hdr->rst));
+		printf("# cnt		%u\n", ntohl(hv_2_hdr->cnt));
+		printf("# len		%u\n", ntohl(hv_2_hdr->len));
+		printf("# long		%u\n", ntohl(hv_2_hdr->flow_long));
+
+		printf("### hv 3 ###\n");
+		printf("# ts_start	%u\n", ntohl(hv_3_hdr->ts_start));
+		printf("# ts_end	%u\n", ntohl(hv_3_hdr->ts_end));
+		printf("# ts_agg	%u\n", ntohl(hv_3_hdr->ts_agg));
+		printf("# ip_src	%u.%u.%u.%u\n",
+			   (hv_3_hdr->ip_src >> 0) & 0xff,
+			   (hv_3_hdr->ip_src >> 8) & 0xff,
+			   (hv_3_hdr->ip_src >> 16) & 0xff,
+			   (hv_3_hdr->ip_src >> 24) & 0xff);
+		printf("# ip_dst	%u.%u.%u.%u\n",
+			   (hv_3_hdr->ip_dst >> 0) & 0xff,
+			   (hv_3_hdr->ip_dst >> 8) & 0xff,
+			   (hv_3_hdr->ip_dst >> 16) & 0xff,
+			   (hv_3_hdr->ip_dst >> 24) & 0xff);
+		printf("# proto		%u\n", ntohl(hv_3_hdr->proto));
+		printf("# ports		%u\n", ntohl(hv_3_hdr->ports));
+		printf("# syn		%u\n", ntohl(hv_3_hdr->syn));
+		printf("# ack		%u\n", ntohl(hv_3_hdr->ack));
+		printf("# fin		%u\n", ntohl(hv_3_hdr->fin));
+		printf("# rst		%u\n", ntohl(hv_3_hdr->rst));
+		printf("# cnt		%u\n", ntohl(hv_3_hdr->cnt));
+		printf("# len		%u\n", ntohl(hv_3_hdr->len));
+		printf("# long		%u\n", ntohl(hv_3_hdr->flow_long));
 	}
 
-	void print_peregrine_bin_len_hdr() {
+	void print_hv_bin_len_hdr() {
 		if (!has_valid_protocol()) { return; }
 
-		auto bin_len_hdr = get_peregrine_bin_len_hdr();
+		auto bin_len_hdr = get_hv_bin_len_hdr();
 
-		printf("### Peregrine bin len ###\n");
-		printf("# bin_0_0_a		%u\n", ntohl(bin_len_hdr->bin_0_0_a));
-		printf("# bin_0_0_b		%u\n", ntohl(bin_len_hdr->bin_0_0_b));
-		printf("# bin_0_1_a		%u\n", ntohl(bin_len_hdr->bin_0_1_a));
-		printf("# bin_0_1_b		%u\n", ntohl(bin_len_hdr->bin_0_1_b));
-		printf("# bin_0_2_a		%u\n", ntohl(bin_len_hdr->bin_0_2_a));
-		printf("# bin_0_2_b		%u\n", ntohl(bin_len_hdr->bin_0_2_b));
-		printf("# bin_0_3_a		%u\n", ntohl(bin_len_hdr->bin_0_3_a));
-		printf("# bin_0_3_b		%u\n", ntohl(bin_len_hdr->bin_0_3_b));
-		printf("# bin_1_0_a		%u\n", ntohl(bin_len_hdr->bin_1_0_a));
-		printf("# bin_1_0_b		%u\n", ntohl(bin_len_hdr->bin_1_0_b));
-		printf("# bin_1_1_a		%u\n", ntohl(bin_len_hdr->bin_1_1_a));
-		printf("# bin_1_1_b		%u\n", ntohl(bin_len_hdr->bin_1_1_b));
-		printf("# bin_1_2_a		%u\n", ntohl(bin_len_hdr->bin_1_2_a));
-		printf("# bin_1_2_b		%u\n", ntohl(bin_len_hdr->bin_1_2_b));
-		printf("# bin_1_3_a		%u\n", ntohl(bin_len_hdr->bin_1_3_a));
-		printf("# bin_1_3_b		%u\n", ntohl(bin_len_hdr->bin_1_3_b));
-		printf("# bin_2_0_a		%u\n", ntohl(bin_len_hdr->bin_2_0_a));
-		printf("# bin_2_0_b		%u\n", ntohl(bin_len_hdr->bin_2_0_b));
-		printf("# bin_2_1_a		%u\n", ntohl(bin_len_hdr->bin_2_1_a));
-		printf("# bin_2_1_b		%u\n", ntohl(bin_len_hdr->bin_2_1_b));
-		printf("# bin_2_2_a		%u\n", ntohl(bin_len_hdr->bin_2_2_a));
-		printf("# bin_2_2_b		%u\n", ntohl(bin_len_hdr->bin_2_2_b));
-		printf("# bin_2_3_a		%u\n", ntohl(bin_len_hdr->bin_2_3_a));
-		printf("# bin_2_3_b		%u\n", ntohl(bin_len_hdr->bin_2_3_b));
-		printf("# bin_3_0_a		%u\n", ntohl(bin_len_hdr->bin_3_0_a));
-		printf("# bin_3_0_b		%u\n", ntohl(bin_len_hdr->bin_3_0_b));
-		printf("# bin_3_1_a		%u\n", ntohl(bin_len_hdr->bin_3_1_a));
-		printf("# bin_3_1_b		%u\n", ntohl(bin_len_hdr->bin_3_1_b));
-		printf("# bin_3_2_a		%u\n", ntohl(bin_len_hdr->bin_3_2_a));
-		printf("# bin_3_2_b		%u\n", ntohl(bin_len_hdr->bin_3_2_b));
-		printf("# bin_3_3_a		%u\n", ntohl(bin_len_hdr->bin_3_3_a));
-		printf("# bin_3_3_b		%u\n", ntohl(bin_len_hdr->bin_3_3_b));
-		printf("# bin_4_0_a		%u\n", ntohl(bin_len_hdr->bin_4_0_a));
-		printf("# bin_4_0_b		%u\n", ntohl(bin_len_hdr->bin_4_0_b));
-		printf("# bin_4_1_a		%u\n", ntohl(bin_len_hdr->bin_4_1_a));
-		printf("# bin_4_1_b		%u\n", ntohl(bin_len_hdr->bin_4_1_b));
-		printf("# bin_4_2_a		%u\n", ntohl(bin_len_hdr->bin_4_2_a));
-		printf("# bin_4_2_b		%u\n", ntohl(bin_len_hdr->bin_4_2_b));
-		printf("# bin_4_3_a		%u\n", ntohl(bin_len_hdr->bin_4_3_a));
-		printf("# bin_4_3_b		%u\n", ntohl(bin_len_hdr->bin_4_3_b));
+		printf("### hv bin len ###\n");
+		printf("# 0_0_a		%u\n", ntohl(bin_len_hdr->a_0_0));
+		printf("# 0_0_b		%u\n", ntohl(bin_len_hdr->b_0_0));
+		printf("# 0_1_a		%u\n", ntohl(bin_len_hdr->a_0_1));
+		printf("# 0_1_b		%u\n", ntohl(bin_len_hdr->b_0_1));
+		printf("# 0_2_a		%u\n", ntohl(bin_len_hdr->a_0_2));
+		printf("# 0_2_b		%u\n", ntohl(bin_len_hdr->b_0_2));
+		printf("# 0_3_a		%u\n", ntohl(bin_len_hdr->a_0_3));
+		printf("# 0_3_b		%u\n", ntohl(bin_len_hdr->b_0_3));
+		printf("# 1_0_a		%u\n", ntohl(bin_len_hdr->a_1_0));
+		printf("# 1_0_b		%u\n", ntohl(bin_len_hdr->b_1_0));
+		printf("# 1_1_a		%u\n", ntohl(bin_len_hdr->a_1_1));
+		printf("# 1_1_b		%u\n", ntohl(bin_len_hdr->b_1_1));
+		printf("# 1_2_a		%u\n", ntohl(bin_len_hdr->a_1_2));
+		printf("# 1_2_b		%u\n", ntohl(bin_len_hdr->b_1_2));
+		printf("# 1_3_a		%u\n", ntohl(bin_len_hdr->a_1_3));
+		printf("# 1_3_b		%u\n", ntohl(bin_len_hdr->b_1_3));
+		printf("# 2_0_a		%u\n", ntohl(bin_len_hdr->a_2_0));
+		printf("# 2_0_b		%u\n", ntohl(bin_len_hdr->b_2_0));
+		printf("# 2_1_a		%u\n", ntohl(bin_len_hdr->a_2_1));
+		printf("# 2_1_b		%u\n", ntohl(bin_len_hdr->b_2_1));
+		printf("# 2_2_a		%u\n", ntohl(bin_len_hdr->a_2_2));
+		printf("# 2_2_b		%u\n", ntohl(bin_len_hdr->b_2_2));
+		printf("# 2_3_a		%u\n", ntohl(bin_len_hdr->a_2_3));
+		printf("# 2_3_b		%u\n", ntohl(bin_len_hdr->b_2_3));
+		printf("# 3_0_a		%u\n", ntohl(bin_len_hdr->a_3_0));
+		printf("# 3_0_b		%u\n", ntohl(bin_len_hdr->b_3_0));
+		printf("# 3_1_a		%u\n", ntohl(bin_len_hdr->a_3_1));
+		printf("# 3_1_b		%u\n", ntohl(bin_len_hdr->b_3_1));
+		printf("# 3_2_a		%u\n", ntohl(bin_len_hdr->a_3_2));
+		printf("# 3_2_b		%u\n", ntohl(bin_len_hdr->b_3_2));
+		printf("# 3_3_a		%u\n", ntohl(bin_len_hdr->a_3_3));
+		printf("# 3_3_b		%u\n", ntohl(bin_len_hdr->b_3_3));
+		printf("# 4_0_a		%u\n", ntohl(bin_len_hdr->a_4_0));
+		printf("# 4_0_b		%u\n", ntohl(bin_len_hdr->b_4_0));
+		printf("# 4_1_a		%u\n", ntohl(bin_len_hdr->a_4_1));
+		printf("# 4_1_b		%u\n", ntohl(bin_len_hdr->b_4_1));
+		printf("# 4_2_a		%u\n", ntohl(bin_len_hdr->a_4_2));
+		printf("# 4_2_b		%u\n", ntohl(bin_len_hdr->b_4_2));
+		printf("# 4_3_a		%u\n", ntohl(bin_len_hdr->a_4_3));
+		printf("# 4_3_b		%u\n", ntohl(bin_len_hdr->b_4_3));
 	}
 
-	void print_peregrine_bin_ts_hdr() {
+	void print_hv_bin_ts_hdr() {
 		if (!has_valid_protocol()) { return; }
 
-		auto bin_ts_hdr = get_peregrine_bin_ts_hdr();
+		auto bin_ts_hdr = get_hv_bin_ts_hdr();
 
-		printf("### Peregrine bin ts ###\n");
-		printf("# bin_0_0_a		%u\n", ntohl(bin_ts_hdr->bin_0_0_a));
-		printf("# bin_0_0_b		%u\n", ntohl(bin_ts_hdr->bin_0_0_b));
-		printf("# bin_0_1_a		%u\n", ntohl(bin_ts_hdr->bin_0_1_a));
-		printf("# bin_0_1_b		%u\n", ntohl(bin_ts_hdr->bin_0_1_b));
-		printf("# bin_0_2_a		%u\n", ntohl(bin_ts_hdr->bin_0_2_a));
-		printf("# bin_0_2_b		%u\n", ntohl(bin_ts_hdr->bin_0_2_b));
-		printf("# bin_0_3_a		%u\n", ntohl(bin_ts_hdr->bin_0_3_a));
-		printf("# bin_0_3_b		%u\n", ntohl(bin_ts_hdr->bin_0_3_b));
-		printf("# bin_1_0_a		%u\n", ntohl(bin_ts_hdr->bin_1_0_a));
-		printf("# bin_1_0_b		%u\n", ntohl(bin_ts_hdr->bin_1_0_b));
-		printf("# bin_1_1_a		%u\n", ntohl(bin_ts_hdr->bin_1_1_a));
-		printf("# bin_1_1_b		%u\n", ntohl(bin_ts_hdr->bin_1_1_b));
-		printf("# bin_1_2_a		%u\n", ntohl(bin_ts_hdr->bin_1_2_a));
-		printf("# bin_1_2_b		%u\n", ntohl(bin_ts_hdr->bin_1_2_b));
-		printf("# bin_1_3_a		%u\n", ntohl(bin_ts_hdr->bin_1_3_a));
-		printf("# bin_1_3_b		%u\n", ntohl(bin_ts_hdr->bin_1_3_b));
-		printf("# bin_2_0_a		%u\n", ntohl(bin_ts_hdr->bin_2_0_a));
-		printf("# bin_2_0_b		%u\n", ntohl(bin_ts_hdr->bin_2_0_b));
-		printf("# bin_2_1_a		%u\n", ntohl(bin_ts_hdr->bin_2_1_a));
-		printf("# bin_2_1_b		%u\n", ntohl(bin_ts_hdr->bin_2_1_b));
-		printf("# bin_2_2_a		%u\n", ntohl(bin_ts_hdr->bin_2_2_a));
-		printf("# bin_2_2_b		%u\n", ntohl(bin_ts_hdr->bin_2_2_b));
-		printf("# bin_2_3_a		%u\n", ntohl(bin_ts_hdr->bin_2_3_a));
-		printf("# bin_2_3_b		%u\n", ntohl(bin_ts_hdr->bin_2_3_b));
-		printf("# bin_3_0_a		%u\n", ntohl(bin_ts_hdr->bin_3_0_a));
-		printf("# bin_3_0_b		%u\n", ntohl(bin_ts_hdr->bin_3_0_b));
-		printf("# bin_3_1_a		%u\n", ntohl(bin_ts_hdr->bin_3_1_a));
-		printf("# bin_3_1_b		%u\n", ntohl(bin_ts_hdr->bin_3_1_b));
-		printf("# bin_3_2_a		%u\n", ntohl(bin_ts_hdr->bin_3_2_a));
-		printf("# bin_3_2_b		%u\n", ntohl(bin_ts_hdr->bin_3_2_b));
-		printf("# bin_3_3_a		%u\n", ntohl(bin_ts_hdr->bin_3_3_a));
-		printf("# bin_3_3_b		%u\n", ntohl(bin_ts_hdr->bin_3_3_b));
-		printf("# bin_4_0_a		%u\n", ntohl(bin_ts_hdr->bin_4_0_a));
-		printf("# bin_4_0_b		%u\n", ntohl(bin_ts_hdr->bin_4_0_b));
-		printf("# bin_4_1_a		%u\n", ntohl(bin_ts_hdr->bin_4_1_a));
-		printf("# bin_4_1_b		%u\n", ntohl(bin_ts_hdr->bin_4_1_b));
-		printf("# bin_4_2_a		%u\n", ntohl(bin_ts_hdr->bin_4_2_a));
-		printf("# bin_4_2_b		%u\n", ntohl(bin_ts_hdr->bin_4_2_b));
-		printf("# bin_4_3_a		%u\n", ntohl(bin_ts_hdr->bin_4_3_a));
-		printf("# bin_4_3_b		%u\n", ntohl(bin_ts_hdr->bin_4_3_b));
+		printf("### hv bin ts ###\n");
+		printf("# 0_0_a		%u\n", ntohl(bin_ts_hdr->a_0_0));
+		printf("# 0_0_b		%u\n", ntohl(bin_ts_hdr->b_0_0));
+		printf("# 0_1_a		%u\n", ntohl(bin_ts_hdr->a_0_1));
+		printf("# 0_1_b		%u\n", ntohl(bin_ts_hdr->b_0_1));
+		printf("# 0_2_a		%u\n", ntohl(bin_ts_hdr->a_0_2));
+		printf("# 0_2_b		%u\n", ntohl(bin_ts_hdr->b_0_2));
+		printf("# 0_3_a		%u\n", ntohl(bin_ts_hdr->a_0_3));
+		printf("# 0_3_b		%u\n", ntohl(bin_ts_hdr->b_0_3));
+		printf("# 1_0_a		%u\n", ntohl(bin_ts_hdr->a_1_0));
+		printf("# 1_0_b		%u\n", ntohl(bin_ts_hdr->b_1_0));
+		printf("# 1_1_a		%u\n", ntohl(bin_ts_hdr->a_1_1));
+		printf("# 1_1_b		%u\n", ntohl(bin_ts_hdr->b_1_1));
+		printf("# 1_2_a		%u\n", ntohl(bin_ts_hdr->a_1_2));
+		printf("# 1_2_b		%u\n", ntohl(bin_ts_hdr->b_1_2));
+		printf("# 1_3_a		%u\n", ntohl(bin_ts_hdr->a_1_3));
+		printf("# 1_3_b		%u\n", ntohl(bin_ts_hdr->b_1_3));
+		printf("# 2_0_a		%u\n", ntohl(bin_ts_hdr->a_2_0));
+		printf("# 2_0_b		%u\n", ntohl(bin_ts_hdr->b_2_0));
+		printf("# 2_1_a		%u\n", ntohl(bin_ts_hdr->a_2_1));
+		printf("# 2_1_b		%u\n", ntohl(bin_ts_hdr->b_2_1));
+		printf("# 2_2_a		%u\n", ntohl(bin_ts_hdr->a_2_2));
+		printf("# 2_2_b		%u\n", ntohl(bin_ts_hdr->b_2_2));
+		printf("# 2_3_a		%u\n", ntohl(bin_ts_hdr->a_2_3));
+		printf("# 2_3_b		%u\n", ntohl(bin_ts_hdr->b_2_3));
+		printf("# 3_0_a		%u\n", ntohl(bin_ts_hdr->a_3_0));
+		printf("# 3_0_b		%u\n", ntohl(bin_ts_hdr->b_3_0));
+		printf("# 3_1_a		%u\n", ntohl(bin_ts_hdr->a_3_1));
+		printf("# 3_1_b		%u\n", ntohl(bin_ts_hdr->b_3_1));
+		printf("# 3_2_a		%u\n", ntohl(bin_ts_hdr->a_3_2));
+		printf("# 3_2_b		%u\n", ntohl(bin_ts_hdr->b_3_2));
+		printf("# 3_3_a		%u\n", ntohl(bin_ts_hdr->a_3_3));
+		printf("# 3_3_b		%u\n", ntohl(bin_ts_hdr->b_3_3));
+		printf("# 4_0_a		%u\n", ntohl(bin_ts_hdr->a_4_0));
+		printf("# 4_0_b		%u\n", ntohl(bin_ts_hdr->b_4_0));
+		printf("# 4_1_a		%u\n", ntohl(bin_ts_hdr->a_4_1));
+		printf("# 4_1_b		%u\n", ntohl(bin_ts_hdr->b_4_1));
+		printf("# 4_2_a		%u\n", ntohl(bin_ts_hdr->a_4_2));
+		printf("# 4_2_b		%u\n", ntohl(bin_ts_hdr->b_4_2));
+		printf("# 4_3_a		%u\n", ntohl(bin_ts_hdr->a_4_3));
+		printf("# 4_3_b		%u\n", ntohl(bin_ts_hdr->b_4_3));
 	}
 } __attribute__((packed));
 

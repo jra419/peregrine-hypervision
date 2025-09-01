@@ -1,3 +1,4 @@
+#include "fchv.hpp"
 #include "hypervision.hpp"
 
 namespace hypervision {
@@ -30,26 +31,29 @@ std::unordered_map<uint8_t, uint32_t> dict_bin_len = {
 	{9, 2560}
 };
 
-void Hypervision::start_stream(void) {
-	interface = jin_main["packet_listen"]["interface"];
+void Hypervision::stream_dp() {
+	interface = jin_main["stream_dp"]["interface"];
 	Listener p_listener(interface);
 
-
 	std::thread listener_thread(&Hypervision::listener, this, std::ref(p_listener));
-	auto last_ts = std::chrono::steady_clock::now();
 
+	last_ts = std::chrono::steady_clock::now();
 	while (true) {
-		auto cur_ts         = std::chrono::steady_clock::now();
-		auto elapsed_time   = std::chrono::duration_cast<std::chrono::seconds>(cur_ts - last_ts);
+		cur_ts				= std::chrono::steady_clock::now();
+		auto elapsed_time	= std::chrono::duration_cast<std::chrono::seconds>(cur_ts - last_ts);
 
-		if (elapsed_time.count() > max_time) {
-			std::cout << "Epoch " << std::to_string(epoch_cntr)
+		if (elapsed_time.count() > max_time &&
+					((cur_epoch == 0 && cur_cntr > 1) || cur_epoch > 0)) {
+			std::cout << "elapsed time: " << elapsed_time.count() << std::endl;
+			std::cout << "max time: " << max_time << std::endl;
+			std::cout << "cur epoch: " << cur_epoch << std::endl;
+			std::cout << "cur counter: " << cur_cntr << std::endl;
+			std::cout << "Epoch " << std::to_string(cur_epoch)
 					  << ": No samples received." << std::endl;
 			running = false;
 			listener_thread.join();
-			break;
-		} else {
-			if (cur_cntr >= epoch_cntr) {
+			exit(0);
+		} else if (cur_cntr >= epoch_cntr) {
 				std::cout << "Epoch " << std::to_string(cur_epoch)
 						  << ": " << std::to_string(sampl_vec.size())
 						  << " Samples received." << std::endl;
@@ -59,45 +63,106 @@ void Hypervision::start_stream(void) {
 
 				cur_cntr	= 0;
 				last_ts		= cur_ts;
-			}
+		} else {
+			continue;
 		}
 
 		process_received_pkts();
+		stream_graph();
+	}
+}
 
-		#ifdef DEBUG
-			LOGF("Split datasets.");
-		#endif
-		const auto p_dataset_constructor = make_shared<BasicDataset>(parse_result);
-		p_dataset_constructor->configure_via_json(jin_main["dataset_construct"]);
-		p_dataset_constructor->do_dataset_construct();
-		label = p_dataset_constructor->get_label();
+void Hypervision::stream_cp() {
+	trace		= jin_main["stream_cp"]["trace"];
+	hv_dataset	= jin_main["stream_cp"]["hv-dataset"];
 
-		#ifdef DEBUG
-			LOGF("Construct edge.");
-		#endif
-		const auto p_edge_constructor = make_shared<edge_constructor>(parse_result);
-		p_edge_constructor->config_via_json(jin_main["edge_construct"]);
-		p_edge_constructor->do_construct();
-		tie(p_short_edges, p_long_edges) = p_edge_constructor->get_edge();
+	// Initialize HyperVision's feature extraction/computation.
+	FCHv fc(trace, hv_dataset);
 
-		#ifdef DEBUG
-			LOGF("Construct Graph.");
-		#endif
-		const auto p_graph = make_shared<traffic_graph>(p_short_edges, p_long_edges);
-		p_graph->config_via_json(jin_main["graph_analyze"]);
-		p_graph->parse_edge();
-		#ifdef DEBUG
-			LOGF("Graph Detect.");
-		#endif
-		p_graph->graph_detect();
-		p_loss = p_graph->get_final_pkt_score(label);
+	while (true) {
+		pkt_cnt_global++;
 
-		if (save_result_enable) {
-			do_save_stream(save_result_name, save_result_path);
+		if (pkt_cnt_global % 10000 == 0) {
+			std::cout << "Processed pkts: " << pkt_cnt_global << std::endl;
 		}
 
-		parse_result.clear();
+		if (!hv_dataset) {
+			trace_index = fc.fe();
+		} else {
+			trace_index = fc.fe_hv();
+		}
+
+		// Non-IP packet / nan fields.
+		if (trace_index == 0) {
+			continue;
+		// Exception caught.
+		} else if (trace_index == -1) {
+			break;
+		}
+
+		int update_status = fc.process();
+
+		if (update_status == 0) {
+			std::cout << "UPDATE 0" <<std::endl;
+			sampl_vec.push_back(fc.as_sample());
+
+			cur_cntr++;
+			#ifdef DEBUG
+				std::cout << "Cur cntr: " << cur_cntr << std::endl;
+			#endif
+
+			if (cur_cntr >= epoch_cntr) {
+				std::cout << "Epoch " << std::to_string(cur_epoch)
+						  << ": " << std::to_string(sampl_vec.size())
+						  << " Samples received." << std::endl;
+				sampl_vec_cur = sampl_vec;
+				sampl_vec.clear();
+				cur_epoch++;
+				cur_cntr = 0;
+			}
+		} else {
+			continue;
+		}
 	}
+
+	process_received_pkts();
+	stream_graph();
+}
+
+void Hypervision::stream_graph() {
+	#ifdef DEBUG
+		LOGF("Split datasets.");
+	#endif
+	const auto p_dataset_constructor = make_shared<BasicDataset>(parse_result);
+	p_dataset_constructor->configure_via_json(jin_main["dataset_construct"]);
+	p_dataset_constructor->do_dataset_construct();
+	label = p_dataset_constructor->get_label();
+
+	#ifdef DEBUG
+		LOGF("Construct edge.");
+	#endif
+	const auto p_edge_constructor = make_shared<edge_constructor>(parse_result);
+	p_edge_constructor->config_via_json(jin_main["edge_construct"]);
+	p_edge_constructor->do_construct();
+	tie(p_short_edges, p_long_edges) = p_edge_constructor->get_edge();
+
+	#ifdef DEBUG
+		LOGF("Construct Graph.");
+	#endif
+	const auto p_graph = make_shared<traffic_graph>(p_short_edges, p_long_edges);
+	p_graph->config_via_json(jin_main["graph_analyze"]);
+	p_graph->parse_edge();
+	#ifdef DEBUG
+		LOGF("Graph Detect.");
+	#endif
+	p_graph->graph_detect();
+	p_loss = p_graph->get_final_pkt_score(label);
+
+	if (save_result_enable) {
+		do_save_stream(save_result_name, save_result_path);
+	}
+
+	parse_result.clear();
 }
 
 void Hypervision::process_received_pkts(void) {
@@ -127,10 +192,10 @@ void Hypervision::process_received_pkts(void) {
 			proto		= sampl_vec_cur.at(i).proto_0;
 			port_src	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_0 >> 16);
 			port_dst	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_0 & 0xFFFF);
-			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_0 >> 16);
-			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_0 & 0xFFFF);
-			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_0 >> 16);
-			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_0 & 0xFFFF);
+			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_0);
+			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).ack_0);
+			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_0);
+			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).rst_0);
 			cnt			= sampl_vec_cur.at(i).cnt_0;
 			len			= sampl_vec_cur.at(i).len_0;
 			flow_long	= sampl_vec_cur.at(i).long_0;
@@ -195,6 +260,7 @@ void Hypervision::process_received_pkts(void) {
 								 ts_end, ts_agg, flag_syn, flag_ack, flag_fin, flag_rst, code, cnt, len, flow_long, bin_len, bin_len_num_pos, bin_ts);
 			parse_result.push_back(std::make_shared<flow>(cur_flow));
 		}
+
 		if (sampl_vec_cur.at(i).ts_start_1 != 0) {
 			ts_start	= sampl_vec_cur.at(i).ts_start_1;
 			ts_end		= sampl_vec_cur.at(i).ts_end_1;
@@ -204,10 +270,10 @@ void Hypervision::process_received_pkts(void) {
 			proto		= sampl_vec_cur.at(i).proto_1;
 			port_src	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_1 >> 16);
 			port_dst	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_1 & 0xFFFF);
-			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_1 >> 16);
-			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_1 & 0xFFFF);
-			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_1 >> 16);
-			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_1 & 0xFFFF);
+			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_1);
+			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).ack_1);
+			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_1);
+			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).rst_1);
 			cnt			= sampl_vec_cur.at(i).cnt_1;
 			len			= sampl_vec_cur.at(i).len_1;
 			flow_long	= sampl_vec_cur.at(i).long_1;
@@ -266,6 +332,7 @@ void Hypervision::process_received_pkts(void) {
 								 ts_end, ts_agg, flag_syn, flag_ack, flag_fin, flag_rst, code, cnt, len, flow_long, bin_len, bin_len_num_pos, bin_ts);
 			parse_result.push_back(std::make_shared<flow>(cur_flow));
 		}
+
 		if (sampl_vec_cur.at(i).ts_start_2 != 0) {
 			ts_start	= sampl_vec_cur.at(i).ts_start_2;
 			ts_end		= sampl_vec_cur.at(i).ts_end_2;
@@ -275,10 +342,10 @@ void Hypervision::process_received_pkts(void) {
 			proto		= sampl_vec_cur.at(i).proto_2;
 			port_src	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_2 >> 16);
 			port_dst	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_2 & 0xFFFF);
-			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_2 >> 16);
-			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_2 & 0xFFFF);
-			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_2 >> 16);
-			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_2 & 0xFFFF);
+			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_2);
+			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).ack_2);
+			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_2);
+			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).rst_2);
 			cnt			= sampl_vec_cur.at(i).cnt_2;
 			len			= sampl_vec_cur.at(i).len_2;
 			flow_long	= sampl_vec_cur.at(i).long_2;
@@ -337,6 +404,7 @@ void Hypervision::process_received_pkts(void) {
 								 ts_end, ts_agg, flag_syn, flag_ack, flag_fin, flag_rst, code, cnt, len, flow_long, bin_len, bin_len_num_pos, bin_ts);
 			parse_result.push_back(std::make_shared<flow>(cur_flow));
 		}
+
 		if (sampl_vec_cur.at(i).ts_start_3 != 0) {
 			ts_start	= sampl_vec_cur.at(i).ts_start_3;
 			ts_end		= sampl_vec_cur.at(i).ts_end_3;
@@ -346,10 +414,10 @@ void Hypervision::process_received_pkts(void) {
 			proto		= sampl_vec_cur.at(i).proto_3;
 			port_src	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_3 >> 16);
 			port_dst	= static_cast<uint16_t>(sampl_vec_cur.at(i).ports_3 & 0xFFFF);
-			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_3 >> 16);
-			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_ack_3 & 0xFFFF);
-			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_3 >> 16);
-			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_rst_3 & 0xFFFF);
+			flag_syn	= static_cast<uint16_t>(sampl_vec_cur.at(i).syn_3);
+			flag_ack	= static_cast<uint16_t>(sampl_vec_cur.at(i).ack_3);
+			flag_fin	= static_cast<uint16_t>(sampl_vec_cur.at(i).fin_3);
+			flag_rst	= static_cast<uint16_t>(sampl_vec_cur.at(i).rst_3);
 
 			cnt			= sampl_vec_cur.at(i).cnt_3;
 			len			= sampl_vec_cur.at(i).len_3;
@@ -441,7 +509,11 @@ void Hypervision::listener(Listener& p_listener) {
 	while (running) {
 		auto p_sampl = p_listener.receive_sample();
 		if (p_sampl.valid) {
+			last_ts = cur_ts;
 			cur_cntr++;
+			#ifdef DEBUG
+				std::cout << "Cur cntr: " << cur_cntr << std::endl;
+			#endif
 			sampl_vec.push_back(p_sampl);
 		}
 	}
@@ -450,7 +522,7 @@ void Hypervision::listener(Listener& p_listener) {
 void Hypervision::config_via_json(const nlohmann::json& jin) {
 	try {
 		if (
-			jin.count("packet_listen") &&
+			(jin.count("stream_dp") || jin.count("stream_cp")) &&
 			jin.count("dataset_construct") &&
 			jin.count("flow_construct") &&
 			jin.count("edge_construct") &&
@@ -460,16 +532,24 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 			} else {
 				throw logic_error("Incomplete json configuration.");
 			}
-			const auto j_listen = jin["packet_listen"];
+			if (jin.count("stream_dp")) {
+				const auto j_stream = jin["stream_dp"];
+				if (j_stream.count("max_time")) {
+					max_time =
+							static_cast<decltype(max_time)>(j_stream["max_time"]);
+				}
+				if (j_stream.count("epoch_cntr")) {
+					epoch_cntr =
+							static_cast<decltype(epoch_cntr)>(j_stream["epoch_cntr"]);
+				}
+			} else if (jin.count("stream_cp")) {
+				const auto j_stream = jin["stream_cp"];
+				if (j_stream.count("epoch_cntr")) {
+					epoch_cntr =
+							static_cast<decltype(epoch_cntr)>(j_stream["epoch_cntr"]);
+				}
+			}
 			const auto j_save	= jin["result_save"];
-			if (j_listen.count("max_time")) {
-				save_result_enable =
-						static_cast<decltype(max_time)>(j_save["max_time"]);
-			}
-			if (j_listen.count("epoch_cntr")) {
-				save_result_enable =
-						static_cast<decltype(epoch_cntr)>(j_save["epoch_cntr"]);
-			}
 			if (j_save.count("save_result_enable")) {
 				save_result_enable =
 						static_cast<decltype(save_result_enable)>(j_save["save_result_enable"]);
@@ -488,7 +568,7 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 }
 
 void Hypervision::do_save_stream(const string& save_name, const string& save_path) {
-	ofstream _f(save_path + "/" + save_name + "-" + std::to_string(epoch_cntr) + ".csv");
+	ofstream _f(save_path + "/" + save_name + "-" + std::to_string(cur_epoch-1) + ".csv");
 	if (_f.is_open()) {
 		try {
 			_f << setprecision(4);
@@ -514,6 +594,7 @@ void Hypervision::do_save_stream(const string& save_name, const string& save_pat
 					_f << flush;
 				}
 			}
+			_f << flush;
 		} catch (const exception& e) {
 			FATAL_ERROR(e.what());
 		}
