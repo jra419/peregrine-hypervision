@@ -190,14 +190,19 @@ auto traffic_graph::connected_component() const -> shared_ptr<component> {
 		ret->push_back(_vertex_glb);
 	#endif
 
-	LOGF("Identified %ld components on graph.", ret->size());
+	#ifdef DEBUG
+		LOGF("Identified %ld components on graph.", ret->size());
+	#endif
 
 	return ret;
 }
 
 auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 		shared_ptr<vector<size_t>> {
-	LOGF("Select strong connected components.");
+	
+	#ifdef DEBUG
+		LOGF("Select strong connected components.");
+	#endif
 
 	const auto _f_extract_feature_component = [&] (const component::value_type & cp) -> feature_t {
 		unordered_set<size_t> _long_index, _short_index, _short_agg_index;

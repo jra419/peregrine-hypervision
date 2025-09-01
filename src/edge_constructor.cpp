@@ -68,8 +68,6 @@ void edge_constructor::construct_long_flow(flow_vec & long_flow_pvec, size_t mul
 }
 
 void edge_constructor::construct_short_flow(flow_vec & short_flow_pvec) {
-	__START_FTIMMER__
-
 	if (p_short_edges != nullptr) {
 		WARN("Detect previous short edge.");
 	}
@@ -250,14 +248,9 @@ void edge_constructor::construct_short_flow(flow_vec & short_flow_pvec) {
 			p_short_edges->push_back(make_shared<short_edge>(p_add, code_to_add));
 		}
 	}
-
-	__STOP_FTIMER__
-	__PRINTF_EXE_TIME__
 }
 
 void edge_constructor::construct_short_flow2(flow_vec & short_flow_pvec) {
-		__START_FTIMMER__
-
 	if (p_short_edges != nullptr) {
 		WARN("Detect previous short edge.");
 	}
@@ -552,9 +545,6 @@ void edge_constructor::construct_short_flow2(flow_vec & short_flow_pvec) {
 			p_short_edges->push_back(make_shared<short_edge>(p_add, code_to_add));
 		}
 	}
-
-	__STOP_FTIMER__
-	__PRINTF_EXE_TIME__
 }
 
 void edge_constructor::show_short_edge_statistic(void) const {

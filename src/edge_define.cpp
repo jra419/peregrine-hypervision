@@ -130,8 +130,10 @@ void short_edge::show_edge(size_t max_show) const {
 		}
 	}
 
-	printf("[	%15s:%-6s -> %15s:%-6s ] => Agg Type: %s.\n",
-		   str_saddr.c_str(), str_sp.c_str(), str_daddr.c_str(), str_dp.c_str(), str_agg.c_str());
+	#ifdef DEBUG
+		printf("[	%15s:%-6s -> %15s:%-6s ] => Agg Type: %s.\n",
+			   str_saddr.c_str(), str_sp.c_str(), str_daddr.c_str(), str_dp.c_str(), str_agg.c_str());
+	#endif
 
 	if (!is_no_agg(agg_idx))
 		for (size_t i = 0; i < get_agg_size(); i ++) {
@@ -140,19 +142,25 @@ void short_edge::show_edge(size_t max_show) const {
 			str_sp		= i >= ls_sp.size() ? "-" : ls_sp[i];
 			str_dp		= i >= ls_dp.size() ? "-" : ls_dp[i];
 
-			printf("[-| %15s:%-6s -> %15s:%-6s ]",
-				   str_saddr.c_str(), str_sp.c_str(), str_daddr.c_str(), str_dp.c_str());
-			printf(" [%s]\n", __get_type_str(p_flow->at(i)).c_str());
+			#ifdef DEBUG
+				printf("[-| %15s:%-6s -> %15s:%-6s ]",
+					   str_saddr.c_str(), str_sp.c_str(), str_daddr.c_str(), str_dp.c_str());
+				printf(" [%s]\n", __get_type_str(p_flow->at(i)).c_str());
+			#endif
 
 			num_len ++;
 			if (num_len == max_show) {
-				printf("...... [%6ld lines in total]\n",
-					max(max(p_ls_saddr->size(), p_ls_daddr->size()), max(ls_sp.size(), ls_dp.size())) );
+				#ifdef DEBUG
+					printf("...... [%6ld lines in total]\n",
+						   max(max(p_ls_saddr->size(), p_ls_daddr->size()), max(ls_sp.size(), ls_dp.size())) );
+				#endif
 				break;
 			}
 		}
 
-	printf("[Seq. length]: %ld => [%s].\n\n", seq_len, pkt_seq_str.c_str());
+	#ifdef DEBUG
+		printf("[Seq. length]: %ld => [%s].\n\n", seq_len, pkt_seq_str.c_str());
+	#endif
 }
 
 auto short_edge::get_src_list() const -> shared_ptr<vector<string>> {
