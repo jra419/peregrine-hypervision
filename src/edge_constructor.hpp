@@ -26,7 +26,7 @@ private:
 	void flow_classification(flow_vec & short_flow_pvec, flow_vec & long_flow_pvec);
 	void construct_short_flow(flow_vec & short_flow_pvec);
 	void construct_short_flow2(flow_vec & short_flow_pvec);
-	void construct_long_flow(flow_vec & long_flow_pvec, size_t multiplex=64);
+	void construct_long_flow(flow_vec & long_flow_pvec, size_t multiplex=1);
 
 public:
 	explicit edge_constructor(const decltype(parse_result) parse_result):

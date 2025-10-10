@@ -25,7 +25,7 @@ public:
 	constexpr static double pulse_flow_ctr_line		= 2;
 	constexpr static u_int32_t invalid_packet_line	= 10;
 
-	auto get_avg_packet_rate() const	-> bool;
+	auto get_avg_packet_rate() const	-> double;
 	auto is_huge_flow() const			-> bool;
 	auto is_pulse_flow() const			-> bool;
 	auto is_invalid_flow() const		-> bool;
@@ -35,7 +35,7 @@ public:
 	auto get_src_str() const -> string;
 	auto get_dst_str() const -> string;
 
-	inline auto get_time_range(void) const -> pair<pkt_ts_t, pkt_ts_t> {
+	inline auto get_time_range(void) const -> pair<double_t, double_t> {
 		return {p_flow->ts_start, p_flow->ts_end};
 	}
 };
@@ -90,12 +90,13 @@ inline void set_no_agg (agg_code & _gg) {
 
 class short_edge {
 private:
-	shared_ptr<vector<shared_ptr<flow>>> p_flow;
 	agg_code agg_indicator;
 
 public:
+	shared_ptr<vector<shared_ptr<flow>>> p_flow;
+
 	short_edge(const decltype(p_flow) p_flow, const decltype(agg_indicator) agg_indicator):
-		p_flow(p_flow), agg_indicator(agg_indicator) {}
+		agg_indicator(agg_indicator), p_flow(p_flow) {}
 
 	virtual ~short_edge() {}
 	short_edge(const short_edge &)				= default;
@@ -115,18 +116,22 @@ public:
 		return p_flow->size();
 	}
 
-	inline auto get_time(void) const -> pkt_ts_t {
+	inline auto get_time(void) const -> double_t {
 		const auto p_f = p_flow->at(0);
 		return p_f->ts_start;
 	}
 
-	auto get_time_range(void) const -> pair<pkt_ts_t, pkt_ts_t>;
+	auto get_time_range(void) const -> pair<double_t, double_t>;
 	auto get_src_str(void) const	-> string;
 	auto get_dst_str(void) const	-> string;
 
-	auto get_avg_interval(void) const -> pkt_ts_t {
-		return (p_flow->at(0)->ts_start * p_flow->at(0)->cnt + p_flow->at(0)->ts_agg) /
-			p_flow->at(0)->cnt;
+	auto get_avg_interval(void) const -> double_t {
+		// std::cout << "ts_start: " << p_flow->at(0)->ts_start << std::endl;
+		// std::cout << "cnt: " << p_flow->at(0)->cnt << std::endl;
+		// std::cout << "agg: " << p_flow->at(0)->ts_agg << std::endl;
+		// std::cout << "AVG INTERVAL: " << (p_flow->at(0)->ts_start * p_flow->at(0)->cnt + p_flow->at(0)->ts_agg) / p_flow->at(0)->cnt << std::endl;
+		return (p_flow->at(0)->ts_start * (double) p_flow->at(0)->cnt + p_flow->at(0)->ts_agg) /
+			(double) p_flow->at(0)->cnt;
 	}
 
 	auto get_flow_index(size_t id) const -> shared_ptr<flow> {

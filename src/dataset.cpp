@@ -1,4 +1,5 @@
 #include "dataset.hpp"
+#include "pkt_info.hpp"
 
 using namespace hypervision;
 
@@ -17,7 +18,7 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 		FATAL_ERROR("Parsed dataset not found.");
 	}
 	if (!parse_train.empty() || !parse_test.empty() || !label.empty()) {
-		WARN("The construction of dataset has already be done.");
+		WARN("The construction of dataset has already been done.");
 	}
 
 	size_t line = ceil(parse_result.size() * train_ratio);
@@ -28,6 +29,7 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 	#endif
 
 	fill_n(back_inserter(label), parse_test.size(), false);
+	std::cout << "LABEL SIZE: " << label.size() << std::endl;
 
 	const u_int32_t part_size = ceil(((double) parse_test.size()) / ((double) multiplex));
 	vector<pair<size_t, size_t> > _assign;
@@ -40,38 +42,47 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 		vector<size_t> _index_to_label;
 		for (size_t i = _from; i < _to; ++ i) {
 			const auto ref = parse_test.at(i);
-			if (ref->ts_end - cur_time - attack_time_after > EPS) {
-				if (p_attacker_src4 != nullptr) {
-					const auto p_packet = parse_test.at(i);
-					const string _addr = get_str_addr(tuple_get_src_addr(p_packet->flow_id));
-					for (const string & st: *p_attacker_src4) {
-						if (_addr.find(st) != string::npos) {
+			if (p_attacker_src4 != nullptr) {
+				const auto p_packet = parse_test.at(i);
+				const string _addr = get_str_addr(tuple_get_src_addr(p_packet->flow_id));
+				for (const string & st: *p_attacker_src4) {
+					if (_addr.find(st) != string::npos) {
+						// for (uint i = 0; i < p_packet->cnt; i++) {
 							_index_to_label.push_back(i);
-							break;
-						}
+						// }
+						break;
 					}
 				}
+			}
 
-				if (p_attacker_dst4 != nullptr) {
-					const auto p_packet = parse_test.at(i);
-					const string _addr = get_str_addr(tuple_get_dst_addr(p_packet->flow_id));
-					for (const string & st: *p_attacker_dst4) {
-						if (_addr.find(st) != string::npos) {
+			if (p_attacker_dst4 != nullptr) {
+				const auto p_packet = parse_test.at(i);
+				const string _addr = get_str_addr(tuple_get_dst_addr(p_packet->flow_id));
+				// if (_addr == "25.204.126.222") {
+					// std::cout << "IP decimal: " << tuple_get_dst_addr(p_packet->flow_id) << std::endl;
+					// std::cout << "IP: " << _addr << std::endl;
+				// }
+				for (const string & st: *p_attacker_dst4) {
+					if (_addr.find(st) != string::npos) {
+						// std::cout << "LABEL ADD. IP: " << _addr << std::endl;
+						// for (uint i = 0; i < p_packet->cnt; i++) {
 							_index_to_label.push_back(i);
-							break;
-						}
+						// }
+						break;
 					}
 				}
+			}
 
-				if (p_attacker_srcdst4 != nullptr) {
-					const auto p_packet = parse_test.at(i);
-					const string _srcaddr = get_str_addr(tuple_get_src_addr(p_packet->flow_id));
-					const string _dstaddr = get_str_addr(tuple_get_dst_addr(p_packet->flow_id));
-					for (const pair<string, string> & stp: *p_attacker_srcdst4) {
-						if (_srcaddr.find(stp.first) != string::npos && _dstaddr.find(stp.second) != string::npos) {
+			if (p_attacker_srcdst4 != nullptr) {
+				const auto p_packet = parse_test.at(i);
+				const string _srcaddr = get_str_addr(tuple_get_src_addr(p_packet->flow_id));
+				const string _dstaddr = get_str_addr(tuple_get_dst_addr(p_packet->flow_id));
+				for (const pair<string, string> & stp: *p_attacker_srcdst4) {
+					if (_srcaddr.find(stp.first) != string::npos && _dstaddr.find(stp.second) != string::npos) {
+						// for (uint i = 0; i < p_packet->cnt; i++) {
 							_index_to_label.push_back(i);
-							break;
-						}
+						// }
+						break;
 					}
 				}
 			}
@@ -94,7 +105,7 @@ void BasicDataset::do_dataset_construct(size_t multiplex) {
 
 	size_t num_malicious = count(label.begin(), label.end(), true);
 	#ifdef DEBUG
-		LOGF("[test  set: %8ld packets]", parse_test.size());
+		LOGF("[test set: %8ld packets]", parse_test.size());
 		LOGF("[%8ld benign (%4.2lf%%), %8ld malicious (%4.2lf%%)]",
 			parse_test.size() - num_malicious,
 			100.0 * (parse_test.size() - num_malicious) /  parse_test.size(),

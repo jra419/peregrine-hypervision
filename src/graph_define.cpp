@@ -1,4 +1,5 @@
 #include "graph_define.hpp"
+#include "dataset.hpp"
 
 using namespace hypervision;
 
@@ -42,6 +43,32 @@ void traffic_graph::dump_vertex_anomly(void) const {
 	LOGF("Invalid vertex: %ld, Invalide aggregate: %ld.", va, vga);
 }
 
+std::string traffic_graph::get_flow_label(std::string ip_src, std::string ip_dst) const {
+	if (p_attacker_src4 != nullptr) {
+		for (const string & st: *p_attacker_src4) {
+			if (ip_src.find(st) != string::npos) {
+				return "1";
+			}
+		}
+	}
+	if (p_attacker_dst4 != nullptr) {
+		for (const string & st: *p_attacker_dst4) {
+			if (ip_dst.find(st) != string::npos) {
+				return "1";
+			}
+		}
+	}
+	if (p_attacker_srcdst4 != nullptr) {
+		for (const pair<string, string> & stp: *p_attacker_srcdst4) {
+			if (ip_src.find(stp.first) != string::npos && ip_dst.find(stp.second) != string::npos) {
+				return "1";
+			}
+		}
+	}
+
+	return "0";
+}
+
 auto traffic_graph::get_final_pkt_score(const binary_label_t p_label) ->
 		const decltype(p_pkt_score) {
 	if (p_pkt_score != nullptr) {
@@ -49,36 +76,116 @@ auto traffic_graph::get_final_pkt_score(const binary_label_t p_label) ->
 	}
 
 	p_pkt_score = make_shared<score_t>();
-	fill_n(back_inserter(*p_pkt_score), p_label.size(), -1);
-	for (size_t i = 0; i < p_long_edge->size(); ++ i) {
-		const auto ref = p_long_edge->at(i)->get_raw_flow();
-		const auto res = p_long_edge_score->at(i) + offset_l;
-		p_pkt_score->at(i) = res;
-	}
 
-	for (size_t i = 0; i < p_short_edge->size(); ++i) {
-		for (size_t j = 0; j < p_short_edge->at(i)->get_agg_size(); ++ j) {
-			const auto ref = p_short_edge->at(i)->get_flow_index(j);
-			const auto res = p_short_edge_score->at(i) + offset_s;
-			p_pkt_score->at(j) = res;
+	for (size_t i = 0; i < p_long_edge->size(); ++i) {
+		const auto p_flow = p_long_edge->at(i)->get_raw_flow();
+
+		std::string ip_src		= get_str_addr(tuple_get_src_addr(p_flow->flow_id));
+		std::string ip_dst		= get_str_addr(tuple_get_dst_addr(p_flow->flow_id));
+		std::string proto		= std::to_string(p_flow->proto);
+		std::string port_src	= std::to_string(tuple_get_src_port(p_flow->flow_id));
+		std::string port_dst	= std::to_string(tuple_get_dst_port(p_flow->flow_id));
+		std::string cnt			= std::to_string(p_flow->cnt);
+		std::string loss		= std::to_string(p_long_edge_score->at(i) + offset_l);
+		std::string label		= get_flow_label(ip_src, ip_dst);
+
+		for (uint j = 0; j < p_flow->cnt; ++j) {
+			p_pkt_score->push_back({ip_src, ip_dst, proto, port_src, port_dst, cnt, loss, label});
 		}
 	}
 
-	const auto p_loss = p_pkt_score;
-	assert(p_loss->size() == p_label.size());
-	double_t res_abnormal = 0.0;
-	double_t res_normal = 0.0;
-	size_t n_abnormal = count(p_label.begin(), p_label.end(), true);
-	size_t n_normal = p_label.size() - n_abnormal;
-	for (size_t i = 0; i < p_loss->size(); ++ i) {
-		res_normal += ((double_t) !p_label.at(i)) * p_loss->at(i);
-		res_abnormal += ((double_t) p_label.at(i)) * p_loss->at(i);
+	for (size_t i = 0; i < p_short_edge->size(); ++i) {
+		for (size_t j = 0; j < p_short_edge->at(i)->p_flow->size(); ++j) {
+			const auto p_flow = p_short_edge->at(i)->p_flow->at(j);
+
+			std::string ip_src		= get_str_addr(tuple_get_src_addr(p_flow->flow_id));
+			std::string ip_dst		= get_str_addr(tuple_get_dst_addr(p_flow->flow_id));
+			std::string proto		= std::to_string(p_flow->proto);
+			std::string port_src	= std::to_string(tuple_get_src_port(p_flow->flow_id));
+			std::string port_dst	= std::to_string(tuple_get_dst_port(p_flow->flow_id));
+			std::string cnt			= std::to_string(p_flow->cnt);
+			std::string loss		= std::to_string(p_short_edge_score->at(i) + offset_s);
+			std::string label		= get_flow_label(ip_src, ip_dst);
+
+			for (uint k = 0; k < p_flow->cnt; ++k) {
+				p_pkt_score->push_back({ip_src, ip_dst, proto, port_src, port_dst, cnt, loss, label});
+			}
+		}
 	}
-	cout << res_abnormal / n_abnormal << endl;
-	cout << res_normal / n_normal << endl;
+
+	// for (size_t i = 0; i < p_pkt_score->size(); ++i) {
+	// 	if (p_pkt_score->at(i) != 0 && p_pkt_score->at(i) != -1) {
+	// 		std::cout << "Score [" << i << "] = " << p_pkt_score->at(i) << std::endl;
+	// 	}
+	// }
+
+	// const auto p_loss = p_pkt_score;
+	// assert(p_loss->size() == p_label.size());
+	// double_t res_abnormal = 0.0;
+	// double_t res_normal = 0.0;
+	// size_t n_abnormal = count(p_label.begin(), p_label.end(), true);
+	// size_t n_normal = p_label.size() - n_abnormal;
+	// for (size_t i = 0; i < p_loss->size(); ++ i) {
+	// 	res_normal += ((double_t) !p_label.at(i)) * p_loss->at(i);
+	// 	res_abnormal += ((double_t) p_label.at(i)) * p_loss->at(i);
+	// }
+	// cout << res_abnormal / n_abnormal << endl;
+	// cout << res_normal / n_normal << endl;
 
 	return p_pkt_score;
 }
+
+// auto traffic_graph::get_final_pkt_score(const binary_label_t p_label) ->
+// 		const decltype(p_pkt_score) {
+// 	if (p_pkt_score != nullptr) {
+// 		WARN("Previous result overlap.");
+// 	}
+
+// 	std::cout << "LABEL SIZE: " << p_label.size() << std::endl;
+// 	std::cout << "LONG SIZE: " << p_long_edge->size() << std::endl;
+// 	std::cout << "SHORT SIZE: " << p_short_edge->size() << std::endl;
+
+// 	p_pkt_score = make_shared<score_t>();
+// 	fill_n(back_inserter(*p_pkt_score), p_label.size(), -1);
+// 	for (size_t i = 0; i < p_long_edge->size(); ++ i) {
+// 		const auto ref = p_long_edge->at(i)->get_raw_flow();
+// 		const auto res = p_long_edge_score->at(i) + offset_l;
+// 		if (res > p_pkt_score->at(i)) {
+// 			p_pkt_score->at(i) = res;
+// 		}
+// 	}
+
+// 	for (size_t i = 0; i < p_short_edge->size(); ++i) {
+// 		for (size_t j = 0; j < p_short_edge->at(i)->get_agg_size(); ++ j) {
+// 			const auto ref = p_short_edge->at(i)->get_flow_index(j);
+// 			const auto res = p_short_edge_score->at(i) + offset_s;
+// 			if (res > p_pkt_score->at(j)) {
+// 				p_pkt_score->at(j) = res;
+// 			}
+// 		}
+// 	}
+
+// 	// for (size_t i = 0; i < p_pkt_score->size(); ++i) {
+// 	// 	if (p_pkt_score->at(i) != 0 && p_pkt_score->at(i) != -1) {
+// 	// 		std::cout << "Score [" << i << "] = " << p_pkt_score->at(i) << std::endl;
+// 	// 	}
+// 	// }
+
+// 	const auto p_loss = p_pkt_score;
+// 	assert(p_loss->size() == p_label.size());
+// 	double_t res_abnormal = 0.0;
+// 	double_t res_normal = 0.0;
+// 	size_t n_abnormal = count(p_label.begin(), p_label.end(), true);
+// 	size_t n_normal = p_label.size() - n_abnormal;
+// 	for (size_t i = 0; i < p_loss->size(); ++ i) {
+// 		res_normal += ((double_t) !p_label.at(i)) * p_loss->at(i);
+// 		res_abnormal += ((double_t) p_label.at(i)) * p_loss->at(i);
+// 	}
+// 	cout << res_abnormal / n_abnormal << endl;
+// 	cout << res_normal / n_normal << endl;
+
+// 	return p_pkt_score;
+// }
 
 void traffic_graph::config_via_json(const nlohmann::json & jin) {
 	try {
@@ -137,6 +244,40 @@ void traffic_graph::config_via_json(const nlohmann::json & jin) {
 		}
 		if (jin.count("proto_cluster")) {
 			proto_cluster = static_cast<decltype(proto_cluster)>(jin["proto_cluster"]);
+		}
+		if (jin.count("attacker_src4") && jin["attacker_src4"].size() != 0) {
+			if (p_attacker_src4 != nullptr) {
+				WARN("Reconfigure attacker source IPv4 list");
+			}
+			p_attacker_src4 = make_shared<decltype(p_attacker_src4)::element_type>();
+			const auto _ls = jin["attacker_src4"];
+			for (const auto & _l: _ls) {
+				p_attacker_src4->push_back(static_cast<string>(_l));
+			}
+		}
+		if (jin.count("attacker_dst4") && jin["attacker_dst4"].size() != 0) {
+			if (p_attacker_dst4 != nullptr) {
+				WARN("Reconfigure attacker destination IPv4 list");
+			}
+			p_attacker_dst4 = make_shared<decltype(p_attacker_dst4)::element_type>();
+			const auto _ls = jin["attacker_dst4"];
+			for (const auto & _l: _ls) {
+				p_attacker_dst4->push_back(static_cast<string>(_l));
+			}
+		}
+		if (jin.count("attacker_srcdst4") && jin["attacker_srcdst4"].size() != 0) {
+			if (p_attacker_srcdst4 != nullptr) {
+				WARN("Reconfigure attacker source-destination IPv4 list");
+			}
+			p_attacker_srcdst4 = make_shared<decltype(p_attacker_srcdst4)::element_type>();
+			const auto _ls = jin["attacker_srcdst4"];
+			for (const auto & _l: _ls) {
+				if (_l.size() != 2) {
+					LOGF("[l size: %ld]", _l.size());
+					FATAL_ERROR("Wrong configuration format.");
+				}
+				p_attacker_srcdst4->push_back({static_cast<string>(_l[0]), static_cast<string>(_l[1])});
+			}
 		}
 	} catch (const exception & e) {
 		FATAL_ERROR(e.what());

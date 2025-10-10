@@ -52,6 +52,37 @@ auto traffic_graph::_f_exeract_feature_short(const size_t index) const -> featur
 		ret.push_back((double) p_e->get_pkt_seq_code());
 	}
 
+	// std::cout << "----- Short edge -----" << std::endl;
+	// std::cout << "f0,f1,f2,f3,f4,f5,f6,f7,f8" << std::endl;
+	// std::cout	<< (double_t) is_src_agg(_agg_code) << ","
+	// 			<< (double_t) is_srcp_agg(_agg_code) << ","
+	// 			<< (double_t) is_dst_agg(_agg_code) << ","
+	// 			<< (double_t) is_dstp_agg(_agg_code) << ","
+	// 			<< (double_t) src_degree.first << ","
+	// 			<< (double_t) src_degree.second << ","
+	// 			<< (double_t) dst_degree.first << ","
+	// 			<< (double_t) dst_degree.second << ","
+	// 			<< (double_t) p_e->get_pkt_seq_code()
+	// 			<< std::endl;
+	// for (const auto &p_f: * p_e->p_flow) {
+	// 	std::cout << "ts_start,ts_end,ts_agg,ip_src,ip_dst,ip_proto,port_src,port_dst,tcp_syn,tcp_ack,tcp_fin,tcp_rst,cnt,len,long" << std::endl;
+	// 	std::cout	<< p_f->ts_start		<< ","
+	// 				<< p_f->ts_end			<< ","
+	// 				<< p_f->ts_agg			<< ","
+	// 				<< get_str_addr(tuple_get_src_addr(p_f->flow_id))	<< ","
+	// 				<< get_str_addr(tuple_get_dst_addr(p_f->flow_id))	<< ","
+	// 				<< p_f->proto			<< ","
+	// 				<< tuple_get_src_port(p_f->flow_id)		<< ","
+	// 				<< tuple_get_dst_port(p_f->flow_id)		<< ","
+	// 				<< p_f->flag_syn		<< ","
+	// 				<< p_f->flag_ack		<< ","
+	// 				<< p_f->flag_fin		<< ","
+	// 				<< p_f->flag_rst		<< ","
+	// 				<< p_f->cnt				<< ","
+	// 				<< p_f->len				<< ","
+	// 				<< p_f->flow_long		<< std::endl;
+	// }
+
 	return ret;
 };
 
@@ -63,6 +94,40 @@ auto traffic_graph::_f_exeract_feature_short2(const size_t index) const -> featu
 
 	const auto src_degree = __f_get_inout_degree(_saddr);
 	const auto dst_degree = __f_get_inout_degree(_daddr);
+
+	// std::cout << "----- Short edge 2 -----" << std::endl;
+	// std::cout << "f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11" << std::endl;
+	// std::cout	<< (double_t) is_src_agg(_agg_code) << ","
+	// 			<< (double_t) is_srcp_agg(_agg_code) << ","
+	// 			<< (double_t) is_dst_agg(_agg_code) << ","
+	// 			<< (double_t) is_dstp_agg(_agg_code) << ","
+	// 			<< (double_t) src_degree.first << ","
+	// 			<< (double_t) src_degree.second << ","
+	// 			<< (double_t) dst_degree.first << ","
+	// 			<< (double_t) dst_degree.second << ","
+	// 			<< (double_t) p_e->get_agg_size() << ","
+	// 			<< (double_t) p_e->get_pkt_seq_size() << ","
+	// 			<< (double_t) p_e->get_agg_code() << ","
+	// 			<< (double_t) p_e->get_avg_interval()
+	// 			<< std::endl;
+	// for (const auto &p_f: * p_e->p_flow) {
+	// 	std::cout << "ts_start,ts_end,ts_agg,ip_src,ip_dst,ip_proto,port_src,port_dst,tcp_syn,tcp_ack,tcp_fin,tcp_rst,cnt,len,long" << std::endl;
+	// 	std::cout	<< p_f->ts_start		<< ","
+	// 				<< p_f->ts_end			<< ","
+	// 				<< p_f->ts_agg			<< ","
+	// 				<< get_str_addr(tuple_get_src_addr(p_f->flow_id))	<< ","
+	// 				<< get_str_addr(tuple_get_dst_addr(p_f->flow_id))	<< ","
+	// 				<< p_f->proto			<< ","
+	// 				<< tuple_get_src_port(p_f->flow_id)		<< ","
+	// 				<< tuple_get_dst_port(p_f->flow_id)		<< ","
+	// 				<< p_f->flag_syn		<< ","
+	// 				<< p_f->flag_ack		<< ","
+	// 				<< p_f->flag_fin		<< ","
+	// 				<< p_f->flag_rst		<< ","
+	// 				<< p_f->cnt				<< ","
+	// 				<< p_f->len				<< ","
+	// 				<< p_f->flow_long		<< std::endl;
+	// }
 
 	return {
 		(double_t) is_src_agg(_agg_code),
@@ -98,6 +163,36 @@ auto traffic_graph::_f_exeract_feature_long(const size_t index) const -> feature
 		ret.push_back((double) p_e->get_raw_flow()->tp);
 	}
 
+	auto f0 = long_edge_out.count(_saddr) ? (double) long_edge_out.at(_saddr).size() : 0.0;
+	auto f1 = long_edge_in.count(_saddr) ? (double) long_edge_in.at(_saddr).size() : 0.0;
+	auto f2 = long_edge_out.count(_daddr) ? (double) long_edge_out.at(_daddr).size() : 0.0;
+	auto f3 = long_edge_in.count(_daddr) ? (double) long_edge_in.at(_daddr).size() : 0.0;
+
+	// std::cout << "----- Long edge -----" << std::endl;
+	// std::cout << "f0,f1,f2,f3,f4" << std::endl;
+	// std::cout	<< f0 << ","
+	// 			<< f1 << ","
+	// 			<< f2 << ","
+	// 			<< f3 << ","
+	// 			<< (double_t) p_e->get_raw_flow()->tp
+	// 			<< std::endl;
+	// std::cout << "ts_start,ts_end,ts_agg,ip_src,ip_dst,ip_proto,port_src,port_dst,tcp_syn,tcp_ack,tcp_fin,tcp_rst,cnt,len,long" << std::endl;
+	// std::cout	<< p_e->p_flow->ts_start		<< ","
+	// 			<< p_e->p_flow->ts_end			<< ","
+	// 			<< p_e->p_flow->ts_agg			<< ","
+	// 			<< get_str_addr(tuple_get_src_addr(p_e->p_flow->flow_id))	<< ","
+	// 			<< get_str_addr(tuple_get_dst_addr(p_e->p_flow->flow_id))	<< ","
+	// 			<< p_e->p_flow->proto			<< ","
+	// 			<< tuple_get_src_port(p_e->p_flow->flow_id)	<< ","
+	// 			<< tuple_get_dst_port(p_e->p_flow->flow_id)	<< ","
+	// 			<< p_e->p_flow->flag_syn		<< ","
+	// 			<< p_e->p_flow->flag_ack		<< ","
+	// 			<< p_e->p_flow->flag_fin		<< ","
+	// 			<< p_e->p_flow->flag_rst		<< ","
+	// 			<< p_e->p_flow->cnt			<< ","
+	// 			<< p_e->p_flow->len			<< ","
+	// 			<< p_e->p_flow->flow_long		<< std::endl;
+
 	return ret;
 };
 
@@ -106,6 +201,42 @@ auto traffic_graph::_f_exeract_feature_long2(const size_t idx) const -> feature_
 	const auto & _saddr		= p_e->get_src_str();
 	const auto & _daddr		= p_e->get_dst_str();
 	const auto & _time_pair = p_e->get_time_range();
+
+		auto f0 = long_edge_out.count(_saddr) ? (double) long_edge_out.at(_saddr).size() : 0.0;
+		auto f1 = long_edge_in.count(_saddr) ? (double) long_edge_in.at(_saddr).size() : 0.0;
+		auto f2 = long_edge_out.count(_daddr) ? (double) long_edge_out.at(_daddr).size() : 0.0;
+		auto f3 = long_edge_in.count(_daddr) ? (double) long_edge_in.at(_daddr).size() : 0.0;
+
+		// std::cout << "----- Long edge 2 -----" << std::endl;
+		// std::cout << "f0,f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11" << std::endl;
+		// std::cout	<< f0 << ","
+		// 			<< f1 << ","
+		// 			<< f2 << ","
+		// 			<< f3 << ","
+		// 			<< (double_t) p_e->p_flow->tp << ","
+		// 			<< (double_t) p_e->p_flow->proto_num << ","
+		// 			<< (double_t) p_e->p_flow->bin_len[1] << ","
+		// 			<< (double_t) p_e->p_flow->bin_len[0] << ","
+		// 			<< (double_t) p_e->p_flow->cnt << ","
+		// 			<< (double_t) p_e->p_flow->ts_end - (double_t) p_e->p_flow->ts_start << ","
+		// 			<< (double_t) p_e->get_avg_packet_rate()
+		// 			<< std::endl;
+		// std::cout << "ts_start,ts_end,ts_agg,ip_src,ip_dst,ip_proto,port_src,port_dst,tcp_syn,tcp_ack,tcp_fin,tcp_rst,cnt,len,long" << std::endl;
+		// std::cout	<< p_e->p_flow->ts_start		<< ","
+		// 			<< p_e->p_flow->ts_end			<< ","
+		// 			<< p_e->p_flow->ts_agg			<< ","
+		// 			<< get_str_addr(tuple_get_src_addr(p_e->p_flow->flow_id))	<< ","
+		// 			<< get_str_addr(tuple_get_dst_addr(p_e->p_flow->flow_id))	<< ","
+		// 			<< p_e->p_flow->proto			<< ","
+		// 			<< tuple_get_src_port(p_e->p_flow->flow_id)	<< ","
+		// 			<< tuple_get_dst_port(p_e->p_flow->flow_id)	<< ","
+		// 			<< p_e->p_flow->flag_syn		<< ","
+		// 			<< p_e->p_flow->flag_ack		<< ","
+		// 			<< p_e->p_flow->flag_fin		<< ","
+		// 			<< p_e->p_flow->flag_rst		<< ","
+		// 			<< p_e->p_flow->cnt			<< ","
+		// 			<< p_e->p_flow->len			<< ","
+		// 			<< p_e->p_flow->flow_long		<< std::endl;
 
 	return {
 		long_edge_out.count(_saddr) ? (double) long_edge_out.at(_saddr).size() : 0.0,
@@ -124,7 +255,8 @@ auto traffic_graph::_f_exeract_feature_long2(const size_t idx) const -> feature_
 		// Number of packets in the long flow
 		(double_t) p_e->p_flow->cnt,
 		// Flow completion time
-		(double_t) p_e->p_flow->ts_end,
+		// (double_t) p_e->p_flow->ts_end,
+		(double_t) p_e->p_flow->ts_end - (double_t) p_e->p_flow->ts_start,
 		// Packet rate of the long flow
 		(double_t) p_e->get_avg_packet_rate()
 	};

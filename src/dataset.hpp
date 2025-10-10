@@ -10,29 +10,32 @@ using binary_label_t = vector<bool>;
 class BasicDataset {
 
 private:
-	vector<shared_ptr<flow>> parse_result;
-	vector<shared_ptr<flow>> parse_train, parse_test;
-	double_t train_ratio = 0.25;
-	uint32_t train_num = 0;
-	uint32_t sampl = 1;
+	vector<shared_ptr<flow>>					parse_result;
+	vector<shared_ptr<flow>>					parse_train, parse_test;
+
+	shared_ptr<vector<string>>					p_attacker_src4;
+	shared_ptr<vector<string>>					p_attacker_dst4;
+	shared_ptr<vector<pair<string, string>>>	p_attacker_srcdst4;
+
+	double_t train_ratio		= 0;
+	uint32_t train_num			= 0;
+	uint32_t sampl				= 1;
+	uint32_t attack_time_after	= 0;
 
 	binary_label_t label;
-	uint32_t attack_time_after = 0;
-	shared_ptr<vector<string> > p_attacker_src4;
-	shared_ptr<vector<string> > p_attacker_dst4;
-	shared_ptr<vector<pair<string, string> > > p_attacker_srcdst4;
 
-	string export_data_path = "";
-	string export_label_path = "";
-
-	string load_data_path = "";
-	string load_label_path = "";
+	string export_data_path		= "";
+	string export_label_path	= "";
+	string load_data_path		= "";
+	string load_label_path		= "";
 
 public:
+
 	BasicDataset() {}
-	BasicDataset(const decltype(parse_result) parse_result,
-				  const double_t train_ratio=0.25, const double_t attack_time_after=0.0):
-				  parse_result(parse_result), train_ratio(train_ratio), attack_time_after(attack_time_after) {}
+	BasicDataset(const decltype(parse_result) parse_result, const double_t train_ratio=0,
+				 const double_t attack_time_after=0.0):
+					parse_result(parse_result), train_ratio(train_ratio),
+					attack_time_after(attack_time_after) {}
 
 	void set_attacker_mach_list(const decltype(p_attacker_src4) p_attacker_src4=nullptr,
 								const decltype(p_attacker_dst4) p_attacker_dst4=nullptr,
@@ -53,7 +56,7 @@ public:
 								(attacker_srcdst4.cbegin(), attacker_srcdst4.cend());
 	}
 
-	void do_dataset_construct(size_t multiplex=64);
+	void do_dataset_construct(size_t multiplex=1);
 	void configure_via_json(const nlohmann::json & jin);
 
 	inline auto get_train_test_dataset(void) const -> pair<decltype(parse_train), decltype(parse_train)> {

@@ -22,9 +22,15 @@ using addr_t			= string;
 class traffic_graph {
 private:
 	using feature_t = vector<double>;
-	using score_t	= vector<double>;
+	// using score_t	= vector<double>;
+	using score_t	= vector<vector<std::string>>;
+
 	shared_ptr<vector<shared_ptr<short_edge>>>	p_short_edge;
 	shared_ptr<vector<shared_ptr<long_edge>>>	p_long_edge;
+
+	shared_ptr<vector<string>>					p_attacker_src4;
+	shared_ptr<vector<string>>					p_attacker_dst4;
+	shared_ptr<vector<pair<string, string>>>	p_attacker_srcdst4;
 
 	unordered_set<addr_t>					vertex_set_long;
 	unordered_set<addr_t>					vertex_set_short_reduce;
@@ -36,8 +42,8 @@ private:
 	unordered_map<addr_t, short_edge_index> short_edge_out;
 	unordered_map<addr_t, short_edge_index> short_edge_out_agg;
 
-	shared_ptr<score_t> p_short_edge_score;
-	shared_ptr<score_t> p_long_edge_score;
+	shared_ptr<vector<double>> p_short_edge_score;
+	shared_ptr<vector<double>> p_long_edge_score;
 	shared_ptr<score_t> p_pkt_score;
 
 	void parse_short_edge(void);
@@ -74,8 +80,8 @@ public:
 	virtual ~traffic_graph () {}
 
 	void parse_edge(void) {
-		p_short_edge_score	= make_shared<score_t>(p_short_edge->size());
-		p_long_edge_score	= make_shared<score_t>(p_long_edge->size());
+		p_short_edge_score	= make_shared<std::vector<double>>(p_short_edge->size());
+		p_long_edge_score	= make_shared<std::vector<double>>(p_long_edge->size());
 
 		std::fill(p_short_edge_score->begin(), p_short_edge_score->end(), 0.0);
 		std::fill(p_long_edge_score->begin(), p_long_edge_score->end(), 0.0);
@@ -101,6 +107,8 @@ public:
 	auto connected_component() const -> shared_ptr<component>;
 
 	auto component_select(const shared_ptr<component> p_com) const -> shared_ptr<vector<size_t>>;
+
+	std::string get_flow_label(std::string ip_src, std::string ip_dst) const;
 
 private:
 	auto __f_get_inout_degree(const addr_t addr) const -> pair<size_t, size_t>;

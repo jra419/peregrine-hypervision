@@ -12,8 +12,8 @@ void traffic_graph::_process_long(const unordered_set<size_t> & _long_idx,
 	vector<size_t> idx_long_remap(_long_idx.cbegin(), _long_idx.cend());
 
 	unordered_map<size_t, size_t>			__long_cluster_size;
-	unordered_map<size_t, pkt_ts_t>			__long_cluster_str;
-	unordered_map<size_t, pkt_ts_t>			__long_cluster_stp;
+	unordered_map<size_t, double_t>			__long_cluster_str;
+	unordered_map<size_t, double_t>			__long_cluster_stp;
 	unordered_map<size_t, vector<size_t> >	__long_cluster_idx;
 
 	for (size_t i = 0; i < assign_long.size(); i ++) {

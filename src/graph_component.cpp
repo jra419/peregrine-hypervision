@@ -199,7 +199,7 @@ auto traffic_graph::connected_component() const -> shared_ptr<component> {
 
 auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 		shared_ptr<vector<size_t>> {
-	
+
 	#ifdef DEBUG
 		LOGF("Select strong connected components.");
 	#endif
@@ -228,8 +228,9 @@ auto traffic_graph::component_select(const shared_ptr<component> p_com) const ->
 		}
 		size_t byte_ctr_long = 0, byte_ctr_short = 0;
 		for (const size_t idx: _long_index) {
-			byte_ctr_long += p_long_edge->at(idx)->p_flow->bin_len[0]
-							 * p_long_edge->at(idx)->p_flow->bin_len[1];
+			// byte_ctr_long += p_long_edge->at(idx)->p_flow->bin_len[0]
+			// 				 * p_long_edge->at(idx)->p_flow->bin_len[1];
+			byte_ctr_long += p_long_edge->at(idx)->p_flow->bin_len[2];
 		}
 		for (const size_t idx: _short_index) {
 			const auto pk_ref = p_short_edge->at(idx)->get_flow_index(0);

@@ -9,6 +9,8 @@
 #include <fstream>
 #include <iomanip>
 #include <chrono>
+#include <ctime>
+#include <sstream>
 
 #include "edge_constructor.hpp"
 #include "flow.hpp"
@@ -27,7 +29,10 @@ private:
 	string trace			= "";
 	string dataset			= "";
 	bool hv_dataset			= false;
+	bool dp_sim				= false;
+	bool is_stream_cp		= false;
 	int epoch_cntr			= 0;
+	double flow_timeout		= 0.0;
 	int cur_cntr			= 0;
 	int cur_epoch			= 0;
 	int empty_epoch_cntr	= 0;
@@ -42,7 +47,7 @@ private:
 	shared_ptr<vector<sample_t>>				p_sampl_vec;
 	shared_ptr<binary_label_t>					p_label;
 	binary_label_t								label;
-	shared_ptr<vector<double_t>>				p_loss;
+	shared_ptr<vector<vector<std::string>>>		p_loss;
 	shared_ptr<vector<shared_ptr<short_edge>>>	p_short_edges;
 	shared_ptr<vector<shared_ptr<long_edge>>>	p_long_edges;
 
@@ -61,9 +66,12 @@ public:
 	template<typename... Args>
 	uint32_t greater_than_zero(Args... args);
 
-	std::pair<uint32_t, uint32_t> val_and_num(uint32_t b0, uint32_t b1, uint32_t b2, uint32_t b3,
-											  uint32_t b4, uint32_t b5, uint32_t b6, uint32_t b7,
-											  uint32_t b8, uint32_t b9);
+	// std::pair<uint32_t, uint32_t> val_and_num(uint32_t b0, uint32_t b1, uint32_t b2, uint32_t b3,
+	// 										  uint32_t b4, uint32_t b5, uint32_t b6, uint32_t b7,
+	// 										  uint32_t b8, uint32_t b9);
+	std::vector<uint32_t> val_and_num(uint32_t b0, uint32_t b1, uint32_t b2, uint32_t b3,
+									  uint32_t b4, uint32_t b5, uint32_t b6, uint32_t b7,
+									  uint32_t b8, uint32_t b9);
 
 	void listener(Listener& p_listener);
 	void config_via_json(const nlohmann::json& jin);

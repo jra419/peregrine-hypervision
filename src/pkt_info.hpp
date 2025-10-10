@@ -93,7 +93,7 @@ inline auto convert_packet2stack_code(const pkt_code_t pc) -> stack_code_t {
 
 using tuple2_conn4 = tuple<pkt_addr4_t, pkt_addr4_t>;
 using tuple4_conn4 = tuple<pkt_addr4_t, pkt_addr4_t, pkt_port_t, pkt_port_t>;
-using tuple5_conn4 = tuple<pkt_addr4_t, pkt_addr4_t, pkt_port_t, pkt_port_t, stack_code_t>;
+using tuple5_conn4 = tuple<pkt_addr4_t, pkt_addr4_t, pkt_port_t, pkt_port_t, pkt_proto_t>;
 
 inline auto tuple_get_src_addr(const tuple2_conn4 & cn) -> pkt_addr4_t {
 	return get<0>(cn);

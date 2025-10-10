@@ -84,7 +84,7 @@ void traffic_graph::_process_short(const unordered_set<size_t> & _short_index,
 		}
 	}
 
-	unordered_map<addr_t, pair<pkt_ts_t, pkt_ts_t>> addr_tim_mp;
+	unordered_map<addr_t, pair<double_t, double_t>> addr_tim_mp;
 	for (const auto& a : addr_set) {
 		addr_tim_mp.insert({a, {HUG, 0}});
 	}
@@ -108,8 +108,8 @@ void traffic_graph::_process_short(const unordered_set<size_t> & _short_index,
 		double_t res = 0;
 		assert(short_origin_index_vec[i].size() == short_clustering_size[i]);
 		if (short_clustering_size[i] > 1) {
-			pkt_ts_t mx = 0;
-			pkt_ts_t mi = INT_MAX;
+			double mx = 0;
+			double mi = INT_MAX;
 			for (const auto index: short_origin_index_vec[i]) {
 				const auto pe = p_short_edge->at(index);
 				mi = min(mi, pe->get_time());

@@ -7,8 +7,8 @@ void long_edge::show_edge(void) const {
 	string daddr		= get_str_addr(tuple_get_dst_addr(p_flow->flow_id));
 	pkt_port_t sp		= tuple_get_src_port(p_flow->flow_id);
 	pkt_port_t dp		= tuple_get_dst_port(p_flow->flow_id);
-	pkt_ts_t ts_start	= p_flow->ts_start;
-	pkt_ts_t ts_end		= p_flow->ts_end;
+	double_t ts_start	= p_flow->ts_start;
+	double_t ts_end		= p_flow->ts_end;
 	pkt_cnt_t cnt		= p_flow->cnt;
 	pkt_len_t len		= p_flow->len;
 }
@@ -29,7 +29,7 @@ auto long_edge::is_huge_flow() const -> bool {
 	}
 }
 
-auto long_edge::get_avg_packet_rate() const -> bool {
+auto long_edge::get_avg_packet_rate() const -> double {
 	return p_flow->cnt / (p_flow->ts_end - p_flow->ts_start);
 }
 
@@ -219,9 +219,11 @@ auto short_edge::get_srcp_list() const -> shared_ptr<vector<pkt_port_t>> {
 	return _ret;
 }
 
-auto short_edge::get_time_range(void) const -> pair<pkt_ts_t, pkt_ts_t> {
-	pkt_ts_t start	= numeric_limits<pkt_ts_t>::max();
-	pkt_ts_t end	= numeric_limits<pkt_ts_t>::min();
+auto short_edge::get_time_range(void) const -> pair<double_t, double_t> {
+	// pkt_ts_t start	= numeric_limits<pkt_ts_t>::max();
+	// pkt_ts_t end	= numeric_limits<pkt_ts_t>::min();
+	double start	= numeric_limits<double_t>::max();
+	double end		= numeric_limits<double_t>::min();
 	for (const auto& pf: *p_flow) {
 		start	= min(start, pf->ts_start);
 		end		= max(end, pf->ts_end);
