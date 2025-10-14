@@ -1,8 +1,12 @@
 .cache/
 build/
 cmake/
-eval/
 conf/*/
-!conf/*
+
+eval/data
+eval/figure
+eval/metrics
+eval/logs
+eval/__pycache__
 
 compile_commands.json
