@@ -158,8 +158,6 @@ int FCHv::fe_hv() {
 	std::string ts, pkt_len, ip_src, ip_dst, ip_proto	= "";
 	std::string tcp_syn, tcp_ack, tcp_fin, tcp_rst		= "";
 	std::string port_src, port_dst						=  "0";
-	char ip_src_char[INET_ADDRSTRLEN];
-	char ip_dst_char[INET_ADDRSTRLEN];
 
 	try {
 		ts_tmp	= std::stod(df_csv.at(cur_idx).at(5));
@@ -305,7 +303,7 @@ int FCHv::process_dp() {
 	timeout_toggle_d = false;
 
 	// Update the current index counter value.
-	if (read_idx < 16383) {
+	if (read_idx < 65536) {
 		read_idx++;
 	} else {
 		read_idx = 0;
@@ -321,36 +319,36 @@ int FCHv::process_dp() {
 	uint16_t port_src_bytes = htons(std::stoi(cur_pkt["port_src"]));
 	uint16_t port_dst_bytes = htons(std::stoi(cur_pkt["port_dst"]));
 
-	uint16_t hash_tmp = crc16(std::vector<uint8_t>(
+	uint16_t hash_tmp = crc32(std::vector<uint8_t>(
 			reinterpret_cast<uint8_t*>(&ip_src_addr),
 			reinterpret_cast<uint8_t*>(&ip_src_addr) + sizeof(ip_src_addr)));
-	hash_tmp = crc16(std::vector<uint8_t>(
+	hash_tmp = crc32(std::vector<uint8_t>(
 			reinterpret_cast<uint8_t*>(&ip_dst_addr),
 			reinterpret_cast<uint8_t*>(&ip_dst_addr) + sizeof(ip_dst_addr)),
 			hash_tmp);
-	hash_tmp = crc16(std::vector<uint8_t>(
+	hash_tmp = crc32(std::vector<uint8_t>(
 			reinterpret_cast<uint8_t*>(&proto_bytes),
 			reinterpret_cast<uint8_t*>(&proto_bytes) + sizeof(proto_bytes)),
 			hash_tmp);
-	hash_tmp = crc16(std::vector<uint8_t>(
+	hash_tmp = crc32(std::vector<uint8_t>(
 			reinterpret_cast<uint8_t*>(&port_src_bytes),
 			reinterpret_cast<uint8_t*>(&port_src_bytes) + sizeof(port_src_bytes)),
 			hash_tmp);
-	hash_tmp = crc16(std::vector<uint8_t>(
+	hash_tmp = crc32(std::vector<uint8_t>(
 			reinterpret_cast<uint8_t*>(&port_dst_bytes),
 			reinterpret_cast<uint8_t*>(&port_dst_bytes) + sizeof(port_dst_bytes)),
 			hash_tmp);
 
-	std::string hash_bin = std::bitset<16>(hash_tmp).to_string();
+	std::string hash_bin = std::bitset<32>(hash_tmp).to_string();
 
-	hash_dp		= std::stol(hash_bin, nullptr, 2);
+	hash_dp = std::stol(hash_bin.substr(14), nullptr, 2);
 
 	// Read/Update the various registers based on the hash value.
-	if (hash_dp < 16384) {
+	if (hash_dp < 65536) {
 		reg_update_dp(0, 1, 2, 3);
-	} else if (hash_dp < 32768) {
+	} else if (hash_dp < 131072) {
 		reg_update_dp(1, 0, 2, 3);
-	} else if (hash_dp < 49152) {
+	} else if (hash_dp < 196602) {
 		reg_update_dp(2, 0, 1, 3);
 	} else {
 		reg_update_dp(3, 0, 1, 2);
@@ -378,10 +376,7 @@ int FCHv::process_cp() {
 	hv_hdr.fill("");
 	hv_bin_len_hdr.fill("");
 	hv_bin_ts_hdr.fill("");
-	timeout_toggle_a = false;
-	timeout_toggle_b = false;
-	timeout_toggle_c = false;
-	timeout_toggle_d = false;
+	timeout_toggle = false;
 
 	hash_cp = std::string("").append(cur_pkt["ip_src"]).append(cur_pkt["ip_dst"]).append(cur_pkt["ip_proto"]).append(cur_pkt["port_src"]).append(cur_pkt["port_dst"]);
 
@@ -408,19 +403,20 @@ hypervision::sample_t FCHv::as_sample() {
 }
 
 void FCHv::reg_update_dp(int a, int b, int c, int d) {
-	long hash_mod = hash_dp >> 2;
+	// long hash_mod = hash_dp >> 2;
+	long hash_mod = hash_dp;
 
 	// Check if the hash_mod exists in reg_ts_dp[a].
 	if ((reg_ts_dp[a].find(hash_mod) != reg_ts_dp[a].end())
 			&& (reg_ts_dp[a][hash_mod][0] != 0 && reg_ts_dp[a][hash_mod][1] != 0)) {
 		double ts_interval_a = std::stod(cur_pkt["ts"]) - reg_ts_dp[a][hash_mod][1];
 
-		if (ts_interval_a > timeout) {
+		if ((ts_interval_a - timeout) > EPS) {
 			timeout_toggle_a = true;
 
-			hv_hdr[14*a]	= std::to_string(static_cast<int>(reg_ts_dp[a][hash_mod][0]));
-			hv_hdr[14*a+1]	= std::to_string(static_cast<int>(reg_ts_dp[a][hash_mod][1]));
-			hv_hdr[14*a+2]	= std::to_string(static_cast<int>(reg_ts_agg_dp[a][hash_mod]));
+			hv_hdr[14*a]	= std::to_string(static_cast<double>(reg_ts_dp[a][hash_mod][0]));
+			hv_hdr[14*a+1]	= std::to_string(static_cast<double>(reg_ts_dp[a][hash_mod][1]));
+			hv_hdr[14*a+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[a][hash_mod]));
 			hv_hdr[14*a+3]	= reg_ip_dp[a][hash_mod][0];
 			hv_hdr[14*a+4]	= reg_ip_dp[a][hash_mod][1];
 			hv_hdr[14*a+5]	= std::to_string(reg_port_dp[a][hash_mod][0]);
@@ -682,12 +678,12 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[b][read_idx][0] != 0 && reg_ts_dp[b][read_idx][1] != 0) {
 			double ts_interval_b = std::stod(cur_pkt["ts"]) - reg_ts_dp[b][read_idx][1];
 
-			if (ts_interval_b > timeout) {
+			if ((ts_interval_b - timeout) > EPS) {
 				timeout_toggle_b = true;
 
-				hv_hdr[14*b]	= std::to_string(static_cast<int>(reg_ts_dp[b][read_idx][0]));
-				hv_hdr[14*b+1]	= std::to_string(static_cast<int>(reg_ts_dp[b][read_idx][1]));
-				hv_hdr[14*b+2]	= std::to_string(static_cast<int>(reg_ts_agg_dp[b][read_idx]));
+				hv_hdr[14*b]	= std::to_string(static_cast<double>(reg_ts_dp[b][read_idx][0]));
+				hv_hdr[14*b+1]	= std::to_string(static_cast<double>(reg_ts_dp[b][read_idx][1]));
+				hv_hdr[14*b+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[b][read_idx]));
 				hv_hdr[14*b+3]	= reg_ip_dp[b][read_idx][0];
 				hv_hdr[14*b+4]	= reg_ip_dp[b][read_idx][1];
 				hv_hdr[14*b+5]	= std::to_string(reg_port_dp[b][read_idx][0]);
@@ -775,12 +771,12 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[c][read_idx][0] != 0 && reg_ts_dp[c][read_idx][1] != 0) {
 			double ts_interval_c = std::stod(cur_pkt["ts"]) - reg_ts_dp[c][read_idx][1];
 
-			if (ts_interval_c > timeout) {
+			if ((ts_interval_c - timeout) > EPS) {
 				timeout_toggle_c = true;
 
-				hv_hdr[14*c]	= std::to_string(static_cast<int>(reg_ts_dp[c][read_idx][0]));
-				hv_hdr[14*c+1]	= std::to_string(static_cast<int>(reg_ts_dp[c][read_idx][1]));
-				hv_hdr[14*c+2]	= std::to_string(static_cast<int>(reg_ts_agg_dp[c][read_idx]));
+				hv_hdr[14*c]	= std::to_string(static_cast<double>(reg_ts_dp[c][read_idx][0]));
+				hv_hdr[14*c+1]	= std::to_string(static_cast<double>(reg_ts_dp[c][read_idx][1]));
+				hv_hdr[14*c+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[c][read_idx]));
 				hv_hdr[14*c+3]	= reg_ip_dp[c][read_idx][0];
 				hv_hdr[14*c+4]	= reg_ip_dp[c][read_idx][1];
 				hv_hdr[14*c+5]	= std::to_string(reg_port_dp[c][read_idx][0]);
@@ -868,12 +864,12 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[d][read_idx][0] != 0 && reg_ts_dp[d][read_idx][1] != 0) {
 			double ts_interval_d = std::stod(cur_pkt["ts"]) - reg_ts_dp[d][read_idx][1];
 
-			if (ts_interval_d > timeout) {
+			if ((ts_interval_d - timeout) > EPS) {
 				timeout_toggle_d = true;
 
-				hv_hdr[14*d]	= std::to_string(static_cast<int>(reg_ts_dp[d][read_idx][0]));
-				hv_hdr[14*d+1]	= std::to_string(static_cast<int>(reg_ts_dp[d][read_idx][1]));
-				hv_hdr[14*d+2]	= std::to_string(static_cast<int>(reg_ts_agg_dp[d][read_idx]));
+				hv_hdr[14*d]	= std::to_string(static_cast<double>(reg_ts_dp[d][read_idx][0]));
+				hv_hdr[14*d+1]	= std::to_string(static_cast<double>(reg_ts_dp[d][read_idx][1]));
+				hv_hdr[14*d+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[d][read_idx]));
 				hv_hdr[14*d+3]	= reg_ip_dp[d][read_idx][0];
 				hv_hdr[14*d+4]	= reg_ip_dp[d][read_idx][1];
 				hv_hdr[14*d+5]	= std::to_string(reg_port_dp[d][read_idx][0]);
@@ -969,8 +965,8 @@ void FCHv::reg_update_cp(int a) {
 	} else {
 		// First time this flow appears, store its start time.
 		reg_ts_cp[a][hash_cp] = {std::stod(cur_pkt["ts"]),
-							   std::stod(cur_pkt["ts"]),
-							   std::stod(cur_pkt["ts"])};
+								 std::stod(cur_pkt["ts"]),
+								 std::stod(cur_pkt["ts"])};
 	}
 
 	// Elapsed time since the last received packet for this flow.
@@ -1348,7 +1344,7 @@ void FCHv::reg_read_cp(int a, int b, int c, int d) {
 }
 
 void FCHv::reg_read_end_dp(int a, int b, int c, int d) {
-	for ( const auto &iter : reg_ts_dp[a]) {
+	for (const auto &iter : reg_ts_dp[a]) {
 		if (reg_ts_dp[a][iter.first][0] != 0 && reg_ts_dp[a][iter.first][1] != 0) {
 			hv_hdr[14*a]	= std::to_string(static_cast<double>(reg_ts_dp[a][iter.first][0]));
 			hv_hdr[14*a+1]	= std::to_string(static_cast<double>(reg_ts_dp[a][iter.first][1]));
@@ -1506,6 +1502,490 @@ void FCHv::reg_read_end_dp(int a, int b, int c, int d) {
 			flow_global_cnt++;
 			cur_samples.push_back(as_sample());
 			reset_regs_dp(a, iter.first);
+		}
+	}
+
+	for (const auto &iter : reg_ts_dp[b]) {
+		if (reg_ts_dp[b][iter.first][0] != 0 && reg_ts_dp[b][iter.first][1] != 0) {
+			hv_hdr[14*b]	= std::to_string(static_cast<double>(reg_ts_dp[b][iter.first][0]));
+			hv_hdr[14*b+1]	= std::to_string(static_cast<double>(reg_ts_dp[b][iter.first][1]));
+			hv_hdr[14*b+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[b][iter.first]));
+			hv_hdr[14*b+3]	= reg_ip_dp[b][iter.first][0];
+			hv_hdr[14*b+4]	= reg_ip_dp[b][iter.first][1];
+			hv_hdr[14*b+5]	= std::to_string(reg_port_dp[b][iter.first][0]);
+			hv_hdr[14*b+6]	= std::to_string(reg_port_dp[b][iter.first][1]);
+			hv_hdr[14*b+7]	= std::to_string(reg_flags_dp[b][iter.first][0]);
+			hv_hdr[14*b+8]	= std::to_string(reg_flags_dp[b][iter.first][1]);
+			hv_hdr[14*b+9]	= std::to_string(reg_flags_dp[b][iter.first][2]);
+			hv_hdr[14*b+10] = std::to_string(reg_flags_dp[b][iter.first][3]);
+			hv_hdr[14*b+11] = std::to_string(reg_data_dp[b][iter.first][0]);
+			hv_hdr[14*b+12] = std::to_string(reg_data_dp[b][iter.first][1]);
+
+			if (reg_data_dp[b][iter.first][0] > 15) {
+				hv_hdr[14*b+13] = "1";
+			} else {
+				hv_hdr[14*b+13] = "0";
+			}
+
+			hv_bin_len_hdr[2*b]			= std::to_string(reg_bin_len_0_dp[b][iter.first][0]);
+			hv_bin_len_hdr[2*b+1]		= std::to_string(reg_bin_len_0_dp[b][iter.first][1]);
+			hv_bin_len_hdr[8+2*b]		= std::to_string(reg_bin_len_1_dp[b][iter.first][0]);
+			hv_bin_len_hdr[8+2*b+1]		= std::to_string(reg_bin_len_1_dp[b][iter.first][1]);
+			hv_bin_len_hdr[16+2*b]		= std::to_string(reg_bin_len_2_dp[b][iter.first][0]);
+			hv_bin_len_hdr[16+2*b+1]	= std::to_string(reg_bin_len_2_dp[b][iter.first][1]);
+			hv_bin_len_hdr[24+2*b]		= std::to_string(reg_bin_len_3_dp[b][iter.first][0]);
+			hv_bin_len_hdr[24+2*b+1]	= std::to_string(reg_bin_len_3_dp[b][iter.first][1]);
+			hv_bin_len_hdr[32+2*b]		= std::to_string(reg_bin_len_4_dp[b][iter.first][0]);
+			hv_bin_len_hdr[32+2*b+1]	= std::to_string(reg_bin_len_4_dp[b][iter.first][1]);
+
+			hv_bin_ts_hdr[2*b]		= std::to_string(reg_bin_ts_0_dp[b][iter.first][0]);
+			hv_bin_ts_hdr[2*b+1]	= std::to_string(reg_bin_ts_0_dp[b][iter.first][1]);
+			hv_bin_ts_hdr[8+2*b]	= std::to_string(reg_bin_ts_1_dp[b][iter.first][0]);
+			hv_bin_ts_hdr[8+2*b+1]	= std::to_string(reg_bin_ts_1_dp[b][iter.first][1]);
+			hv_bin_ts_hdr[16+2*b]	= std::to_string(reg_bin_ts_2_dp[b][iter.first][0]);
+			hv_bin_ts_hdr[16+2*b+1]	= std::to_string(reg_bin_ts_2_dp[b][iter.first][1]);
+			hv_bin_ts_hdr[24+2*b]	= std::to_string(reg_bin_ts_3_dp[b][iter.first][0]);
+			hv_bin_ts_hdr[24+2*b+1]	= std::to_string(reg_bin_ts_3_dp[b][iter.first][1]);
+			hv_bin_ts_hdr[32+2*b]	= std::to_string(reg_bin_ts_4_dp[b][iter.first][0]);
+			hv_bin_ts_hdr[32+2*b+1]	= std::to_string(reg_bin_ts_4_dp[b][iter.first][1]);
+
+			hv_hdr[14*a]	= "0";
+			hv_hdr[14*a+1]	= "0";
+			hv_hdr[14*a+2]	= "0";
+			hv_hdr[14*a+3]	= "0";
+			hv_hdr[14*a+4]	= "0";
+			hv_hdr[14*a+5]	= "0";
+			hv_hdr[14*a+6]	= "0";
+			hv_hdr[14*a+7]	= "0";
+			hv_hdr[14*a+8]	= "0";
+			hv_hdr[14*a+9]	= "0";
+			hv_hdr[14*a+10] = "0";
+			hv_hdr[14*a+11] = "0";
+			hv_hdr[14*a+12] = "0";
+			hv_hdr[14*a+13] = "0";
+
+			hv_bin_len_hdr[2*a]			= "0";
+			hv_bin_len_hdr[2*a+1]		= "0";
+			hv_bin_len_hdr[8+2*a]		= "0";
+			hv_bin_len_hdr[8+2*a+1]		= "0";
+			hv_bin_len_hdr[16+2*a]		= "0";
+			hv_bin_len_hdr[16+2*a+1]	= "0";
+			hv_bin_len_hdr[24+2*a]		= "0";
+			hv_bin_len_hdr[24+2*a+1]	= "0";
+			hv_bin_len_hdr[32+2*a]		= "0";
+			hv_bin_len_hdr[32+2*a+1]	= "0";
+
+			hv_bin_ts_hdr[2*a]		= "0";
+			hv_bin_ts_hdr[2*a+1]	= "0";
+			hv_bin_ts_hdr[8+2*a]	= "0";
+			hv_bin_ts_hdr[8+2*a+1]	= "0";
+			hv_bin_ts_hdr[16+2*a]	= "0";
+			hv_bin_ts_hdr[16+2*a+1]	= "0";
+			hv_bin_ts_hdr[24+2*a]	= "0";
+			hv_bin_ts_hdr[24+2*a+1]	= "0";
+			hv_bin_ts_hdr[32+2*a]	= "0";
+			hv_bin_ts_hdr[32+2*a+1]	= "0";
+
+			hv_hdr[14*c]	= "0";
+			hv_hdr[14*c+1]	= "0";
+			hv_hdr[14*c+2]	= "0";
+			hv_hdr[14*c+3]	= "0";
+			hv_hdr[14*c+4]	= "0";
+			hv_hdr[14*c+5]	= "0";
+			hv_hdr[14*c+6]	= "0";
+			hv_hdr[14*c+7]	= "0";
+			hv_hdr[14*c+8]	= "0";
+			hv_hdr[14*c+9]	= "0";
+			hv_hdr[14*c+10] = "0";
+			hv_hdr[14*c+11] = "0";
+			hv_hdr[14*c+12] = "0";
+			hv_hdr[14*c+13] = "0";
+
+			hv_bin_len_hdr[2*c]			= "0";
+			hv_bin_len_hdr[2*c+1]		= "0";
+			hv_bin_len_hdr[8+2*c]		= "0";
+			hv_bin_len_hdr[8+2*c+1]		= "0";
+			hv_bin_len_hdr[16+2*c]		= "0";
+			hv_bin_len_hdr[16+2*c+1]	= "0";
+			hv_bin_len_hdr[24+2*c]		= "0";
+			hv_bin_len_hdr[24+2*c+1]	= "0";
+			hv_bin_len_hdr[32+2*c]		= "0";
+			hv_bin_len_hdr[32+2*c+1]	= "0";
+
+			hv_bin_ts_hdr[2*c]		= "0";
+			hv_bin_ts_hdr[2*c+1]	= "0";
+			hv_bin_ts_hdr[8+2*c]	= "0";
+			hv_bin_ts_hdr[8+2*c+1]	= "0";
+			hv_bin_ts_hdr[16+2*c]	= "0";
+			hv_bin_ts_hdr[16+2*c+1]	= "0";
+			hv_bin_ts_hdr[24+2*c]	= "0";
+			hv_bin_ts_hdr[24+2*c+1]	= "0";
+			hv_bin_ts_hdr[32+2*c]	= "0";
+			hv_bin_ts_hdr[32+2*c+1]	= "0";
+
+			hv_hdr[14*d]	= "0";
+			hv_hdr[14*d+1]	= "0";
+			hv_hdr[14*d+2]	= "0";
+			hv_hdr[14*d+3]	= "0";
+			hv_hdr[14*d+4]	= "0";
+			hv_hdr[14*d+5]	= "0";
+			hv_hdr[14*d+6]	= "0";
+			hv_hdr[14*d+7]	= "0";
+			hv_hdr[14*d+8]	= "0";
+			hv_hdr[14*d+9]	= "0";
+			hv_hdr[14*d+10] = "0";
+			hv_hdr[14*d+11] = "0";
+			hv_hdr[14*d+12] = "0";
+			hv_hdr[14*d+13] = "0";
+
+			hv_bin_len_hdr[2*d]			= "0";
+			hv_bin_len_hdr[2*d+1]		= "0";
+			hv_bin_len_hdr[8+2*d]		= "0";
+			hv_bin_len_hdr[8+2*d+1]		= "0";
+			hv_bin_len_hdr[16+2*d]		= "0";
+			hv_bin_len_hdr[16+2*d+1]	= "0";
+			hv_bin_len_hdr[24+2*d]		= "0";
+			hv_bin_len_hdr[24+2*d+1]	= "0";
+			hv_bin_len_hdr[32+2*d]		= "0";
+			hv_bin_len_hdr[32+2*d+1]	= "0";
+
+			hv_bin_ts_hdr[2*d]		= "0";
+			hv_bin_ts_hdr[2*d+1]	= "0";
+			hv_bin_ts_hdr[8+2*d]	= "0";
+			hv_bin_ts_hdr[8+2*d+1]	= "0";
+			hv_bin_ts_hdr[16+2*d]	= "0";
+			hv_bin_ts_hdr[16+2*d+1]	= "0";
+			hv_bin_ts_hdr[24+2*d]	= "0";
+			hv_bin_ts_hdr[24+2*d+1]	= "0";
+			hv_bin_ts_hdr[32+2*d]	= "0";
+			hv_bin_ts_hdr[32+2*d+1]	= "0";
+
+			flow_global_cnt++;
+			cur_samples.push_back(as_sample());
+			reset_regs_dp(b, iter.first);
+		}
+	}
+
+	for (const auto &iter : reg_ts_dp[c]) {
+		if (reg_ts_dp[c][iter.first][0] != 0 && reg_ts_dp[c][iter.first][1] != 0) {
+			hv_hdr[14*c]	= std::to_string(static_cast<double>(reg_ts_dp[c][iter.first][0]));
+			hv_hdr[14*c+1]	= std::to_string(static_cast<double>(reg_ts_dp[c][iter.first][1]));
+			hv_hdr[14*c+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[c][iter.first]));
+			hv_hdr[14*c+3]	= reg_ip_dp[c][iter.first][0];
+			hv_hdr[14*c+4]	= reg_ip_dp[c][iter.first][1];
+			hv_hdr[14*c+5]	= std::to_string(reg_port_dp[c][iter.first][0]);
+			hv_hdr[14*c+6]	= std::to_string(reg_port_dp[c][iter.first][1]);
+			hv_hdr[14*c+7]	= std::to_string(reg_flags_dp[c][iter.first][0]);
+			hv_hdr[14*c+8]	= std::to_string(reg_flags_dp[c][iter.first][1]);
+			hv_hdr[14*c+9]	= std::to_string(reg_flags_dp[c][iter.first][2]);
+			hv_hdr[14*c+10] = std::to_string(reg_flags_dp[c][iter.first][3]);
+			hv_hdr[14*c+11] = std::to_string(reg_data_dp[c][iter.first][0]);
+			hv_hdr[14*c+12] = std::to_string(reg_data_dp[c][iter.first][1]);
+
+			if (reg_data_dp[c][iter.first][0] > 15) {
+				hv_hdr[14*c+13] = "1";
+			} else {
+				hv_hdr[14*c+13] = "0";
+			}
+
+			hv_bin_len_hdr[2*c]			= std::to_string(reg_bin_len_0_dp[c][iter.first][0]);
+			hv_bin_len_hdr[2*c+1]		= std::to_string(reg_bin_len_0_dp[c][iter.first][1]);
+			hv_bin_len_hdr[8+2*c]		= std::to_string(reg_bin_len_1_dp[c][iter.first][0]);
+			hv_bin_len_hdr[8+2*c+1]		= std::to_string(reg_bin_len_1_dp[c][iter.first][1]);
+			hv_bin_len_hdr[16+2*c]		= std::to_string(reg_bin_len_2_dp[c][iter.first][0]);
+			hv_bin_len_hdr[16+2*c+1]	= std::to_string(reg_bin_len_2_dp[c][iter.first][1]);
+			hv_bin_len_hdr[24+2*c]		= std::to_string(reg_bin_len_3_dp[c][iter.first][0]);
+			hv_bin_len_hdr[24+2*c+1]	= std::to_string(reg_bin_len_3_dp[c][iter.first][1]);
+			hv_bin_len_hdr[32+2*c]		= std::to_string(reg_bin_len_4_dp[c][iter.first][0]);
+			hv_bin_len_hdr[32+2*c+1]	= std::to_string(reg_bin_len_4_dp[c][iter.first][1]);
+
+			hv_bin_ts_hdr[2*c]		= std::to_string(reg_bin_ts_0_dp[c][iter.first][0]);
+			hv_bin_ts_hdr[2*c+1]	= std::to_string(reg_bin_ts_0_dp[c][iter.first][1]);
+			hv_bin_ts_hdr[8+2*c]	= std::to_string(reg_bin_ts_1_dp[c][iter.first][0]);
+			hv_bin_ts_hdr[8+2*c+1]	= std::to_string(reg_bin_ts_1_dp[c][iter.first][1]);
+			hv_bin_ts_hdr[16+2*c]	= std::to_string(reg_bin_ts_2_dp[c][iter.first][0]);
+			hv_bin_ts_hdr[16+2*c+1]	= std::to_string(reg_bin_ts_2_dp[c][iter.first][1]);
+			hv_bin_ts_hdr[24+2*c]	= std::to_string(reg_bin_ts_3_dp[c][iter.first][0]);
+			hv_bin_ts_hdr[24+2*c+1]	= std::to_string(reg_bin_ts_3_dp[c][iter.first][1]);
+			hv_bin_ts_hdr[32+2*c]	= std::to_string(reg_bin_ts_4_dp[c][iter.first][0]);
+			hv_bin_ts_hdr[32+2*c+1]	= std::to_string(reg_bin_ts_4_dp[c][iter.first][1]);
+
+			hv_hdr[14*a]	= "0";
+			hv_hdr[14*a+1]	= "0";
+			hv_hdr[14*a+2]	= "0";
+			hv_hdr[14*a+3]	= "0";
+			hv_hdr[14*a+4]	= "0";
+			hv_hdr[14*a+5]	= "0";
+			hv_hdr[14*a+6]	= "0";
+			hv_hdr[14*a+7]	= "0";
+			hv_hdr[14*a+8]	= "0";
+			hv_hdr[14*a+9]	= "0";
+			hv_hdr[14*a+10] = "0";
+			hv_hdr[14*a+11] = "0";
+			hv_hdr[14*a+12] = "0";
+			hv_hdr[14*a+13] = "0";
+
+			hv_bin_len_hdr[2*a]			= "0";
+			hv_bin_len_hdr[2*a+1]		= "0";
+			hv_bin_len_hdr[8+2*a]		= "0";
+			hv_bin_len_hdr[8+2*a+1]		= "0";
+			hv_bin_len_hdr[16+2*a]		= "0";
+			hv_bin_len_hdr[16+2*a+1]	= "0";
+			hv_bin_len_hdr[24+2*a]		= "0";
+			hv_bin_len_hdr[24+2*a+1]	= "0";
+			hv_bin_len_hdr[32+2*a]		= "0";
+			hv_bin_len_hdr[32+2*a+1]	= "0";
+
+			hv_bin_ts_hdr[2*a]		= "0";
+			hv_bin_ts_hdr[2*a+1]	= "0";
+			hv_bin_ts_hdr[8+2*a]	= "0";
+			hv_bin_ts_hdr[8+2*a+1]	= "0";
+			hv_bin_ts_hdr[16+2*a]	= "0";
+			hv_bin_ts_hdr[16+2*a+1]	= "0";
+			hv_bin_ts_hdr[24+2*a]	= "0";
+			hv_bin_ts_hdr[24+2*a+1]	= "0";
+			hv_bin_ts_hdr[32+2*a]	= "0";
+			hv_bin_ts_hdr[32+2*a+1]	= "0";
+
+			hv_hdr[14*b]	= "0";
+			hv_hdr[14*b+1]	= "0";
+			hv_hdr[14*b+2]	= "0";
+			hv_hdr[14*b+3]	= "0";
+			hv_hdr[14*b+4]	= "0";
+			hv_hdr[14*b+5]	= "0";
+			hv_hdr[14*b+6]	= "0";
+			hv_hdr[14*b+7]	= "0";
+			hv_hdr[14*b+8]	= "0";
+			hv_hdr[14*b+9]	= "0";
+			hv_hdr[14*b+10] = "0";
+			hv_hdr[14*b+11] = "0";
+			hv_hdr[14*b+12] = "0";
+			hv_hdr[14*b+13] = "0";
+
+			hv_bin_len_hdr[2*b]			= "0";
+			hv_bin_len_hdr[2*b+1]		= "0";
+			hv_bin_len_hdr[8+2*b]		= "0";
+			hv_bin_len_hdr[8+2*b+1]		= "0";
+			hv_bin_len_hdr[16+2*b]		= "0";
+			hv_bin_len_hdr[16+2*b+1]	= "0";
+			hv_bin_len_hdr[24+2*b]		= "0";
+			hv_bin_len_hdr[24+2*b+1]	= "0";
+			hv_bin_len_hdr[32+2*b]		= "0";
+			hv_bin_len_hdr[32+2*b+1]	= "0";
+
+			hv_bin_ts_hdr[2*b]		= "0";
+			hv_bin_ts_hdr[2*b+1]	= "0";
+			hv_bin_ts_hdr[8+2*b]	= "0";
+			hv_bin_ts_hdr[8+2*b+1]	= "0";
+			hv_bin_ts_hdr[16+2*b]	= "0";
+			hv_bin_ts_hdr[16+2*b+1]	= "0";
+			hv_bin_ts_hdr[24+2*b]	= "0";
+			hv_bin_ts_hdr[24+2*b+1]	= "0";
+			hv_bin_ts_hdr[32+2*b]	= "0";
+			hv_bin_ts_hdr[32+2*b+1]	= "0";
+
+			hv_hdr[14*d]	= "0";
+			hv_hdr[14*d+1]	= "0";
+			hv_hdr[14*d+2]	= "0";
+			hv_hdr[14*d+3]	= "0";
+			hv_hdr[14*d+4]	= "0";
+			hv_hdr[14*d+5]	= "0";
+			hv_hdr[14*d+6]	= "0";
+			hv_hdr[14*d+7]	= "0";
+			hv_hdr[14*d+8]	= "0";
+			hv_hdr[14*d+9]	= "0";
+			hv_hdr[14*d+10] = "0";
+			hv_hdr[14*d+11] = "0";
+			hv_hdr[14*d+12] = "0";
+			hv_hdr[14*d+13] = "0";
+
+			hv_bin_len_hdr[2*d]			= "0";
+			hv_bin_len_hdr[2*d+1]		= "0";
+			hv_bin_len_hdr[8+2*d]		= "0";
+			hv_bin_len_hdr[8+2*d+1]		= "0";
+			hv_bin_len_hdr[16+2*d]		= "0";
+			hv_bin_len_hdr[16+2*d+1]	= "0";
+			hv_bin_len_hdr[24+2*d]		= "0";
+			hv_bin_len_hdr[24+2*d+1]	= "0";
+			hv_bin_len_hdr[32+2*d]		= "0";
+			hv_bin_len_hdr[32+2*d+1]	= "0";
+
+			hv_bin_ts_hdr[2*d]		= "0";
+			hv_bin_ts_hdr[2*d+1]	= "0";
+			hv_bin_ts_hdr[8+2*d]	= "0";
+			hv_bin_ts_hdr[8+2*d+1]	= "0";
+			hv_bin_ts_hdr[16+2*d]	= "0";
+			hv_bin_ts_hdr[16+2*d+1]	= "0";
+			hv_bin_ts_hdr[24+2*d]	= "0";
+			hv_bin_ts_hdr[24+2*d+1]	= "0";
+			hv_bin_ts_hdr[32+2*d]	= "0";
+			hv_bin_ts_hdr[32+2*d+1]	= "0";
+
+			flow_global_cnt++;
+			cur_samples.push_back(as_sample());
+			reset_regs_dp(c, iter.first);
+		}
+	}
+
+	for (const auto &iter : reg_ts_dp[d]) {
+		if (reg_ts_dp[d][iter.first][0] != 0 && reg_ts_dp[d][iter.first][1] != 0) {
+			hv_hdr[14*d]	= std::to_string(static_cast<double>(reg_ts_dp[d][iter.first][0]));
+			hv_hdr[14*d+1]	= std::to_string(static_cast<double>(reg_ts_dp[d][iter.first][1]));
+			hv_hdr[14*d+2]	= std::to_string(static_cast<double>(reg_ts_agg_dp[d][iter.first]));
+			hv_hdr[14*d+3]	= reg_ip_dp[d][iter.first][0];
+			hv_hdr[14*d+4]	= reg_ip_dp[d][iter.first][1];
+			hv_hdr[14*d+5]	= std::to_string(reg_port_dp[d][iter.first][0]);
+			hv_hdr[14*d+6]	= std::to_string(reg_port_dp[d][iter.first][1]);
+			hv_hdr[14*d+7]	= std::to_string(reg_flags_dp[d][iter.first][0]);
+			hv_hdr[14*d+8]	= std::to_string(reg_flags_dp[d][iter.first][1]);
+			hv_hdr[14*d+9]	= std::to_string(reg_flags_dp[d][iter.first][2]);
+			hv_hdr[14*d+10] = std::to_string(reg_flags_dp[d][iter.first][3]);
+			hv_hdr[14*d+11] = std::to_string(reg_data_dp[d][iter.first][0]);
+			hv_hdr[14*d+12] = std::to_string(reg_data_dp[d][iter.first][1]);
+
+			if (reg_data_dp[d][iter.first][0] > 15) {
+				hv_hdr[14*d+13] = "1";
+			} else {
+				hv_hdr[14*d+13] = "0";
+			}
+
+			hv_bin_len_hdr[2*d]			= std::to_string(reg_bin_len_0_dp[d][iter.first][0]);
+			hv_bin_len_hdr[2*d+1]		= std::to_string(reg_bin_len_0_dp[d][iter.first][1]);
+			hv_bin_len_hdr[8+2*d]		= std::to_string(reg_bin_len_1_dp[d][iter.first][0]);
+			hv_bin_len_hdr[8+2*d+1]		= std::to_string(reg_bin_len_1_dp[d][iter.first][1]);
+			hv_bin_len_hdr[16+2*d]		= std::to_string(reg_bin_len_2_dp[d][iter.first][0]);
+			hv_bin_len_hdr[16+2*d+1]	= std::to_string(reg_bin_len_2_dp[d][iter.first][1]);
+			hv_bin_len_hdr[24+2*d]		= std::to_string(reg_bin_len_3_dp[d][iter.first][0]);
+			hv_bin_len_hdr[24+2*d+1]	= std::to_string(reg_bin_len_3_dp[d][iter.first][1]);
+			hv_bin_len_hdr[32+2*d]		= std::to_string(reg_bin_len_4_dp[d][iter.first][0]);
+			hv_bin_len_hdr[32+2*d+1]	= std::to_string(reg_bin_len_4_dp[d][iter.first][1]);
+
+			hv_bin_ts_hdr[2*d]		= std::to_string(reg_bin_ts_0_dp[d][iter.first][0]);
+			hv_bin_ts_hdr[2*d+1]	= std::to_string(reg_bin_ts_0_dp[d][iter.first][1]);
+			hv_bin_ts_hdr[8+2*d]	= std::to_string(reg_bin_ts_1_dp[d][iter.first][0]);
+			hv_bin_ts_hdr[8+2*d+1]	= std::to_string(reg_bin_ts_1_dp[d][iter.first][1]);
+			hv_bin_ts_hdr[16+2*d]	= std::to_string(reg_bin_ts_2_dp[d][iter.first][0]);
+			hv_bin_ts_hdr[16+2*d+1]	= std::to_string(reg_bin_ts_2_dp[d][iter.first][1]);
+			hv_bin_ts_hdr[24+2*d]	= std::to_string(reg_bin_ts_3_dp[d][iter.first][0]);
+			hv_bin_ts_hdr[24+2*d+1]	= std::to_string(reg_bin_ts_3_dp[d][iter.first][1]);
+			hv_bin_ts_hdr[32+2*d]	= std::to_string(reg_bin_ts_4_dp[d][iter.first][0]);
+			hv_bin_ts_hdr[32+2*d+1]	= std::to_string(reg_bin_ts_4_dp[d][iter.first][1]);
+
+			hv_hdr[14*a]	= "0";
+			hv_hdr[14*a+1]	= "0";
+			hv_hdr[14*a+2]	= "0";
+			hv_hdr[14*a+3]	= "0";
+			hv_hdr[14*a+4]	= "0";
+			hv_hdr[14*a+5]	= "0";
+			hv_hdr[14*a+6]	= "0";
+			hv_hdr[14*a+7]	= "0";
+			hv_hdr[14*a+8]	= "0";
+			hv_hdr[14*a+9]	= "0";
+			hv_hdr[14*a+10] = "0";
+			hv_hdr[14*a+11] = "0";
+			hv_hdr[14*a+12] = "0";
+			hv_hdr[14*a+13] = "0";
+
+			hv_bin_len_hdr[2*a]			= "0";
+			hv_bin_len_hdr[2*a+1]		= "0";
+			hv_bin_len_hdr[8+2*a]		= "0";
+			hv_bin_len_hdr[8+2*a+1]		= "0";
+			hv_bin_len_hdr[16+2*a]		= "0";
+			hv_bin_len_hdr[16+2*a+1]	= "0";
+			hv_bin_len_hdr[24+2*a]		= "0";
+			hv_bin_len_hdr[24+2*a+1]	= "0";
+			hv_bin_len_hdr[32+2*a]		= "0";
+			hv_bin_len_hdr[32+2*a+1]	= "0";
+
+			hv_bin_ts_hdr[2*a]		= "0";
+			hv_bin_ts_hdr[2*a+1]	= "0";
+			hv_bin_ts_hdr[8+2*a]	= "0";
+			hv_bin_ts_hdr[8+2*a+1]	= "0";
+			hv_bin_ts_hdr[16+2*a]	= "0";
+			hv_bin_ts_hdr[16+2*a+1]	= "0";
+			hv_bin_ts_hdr[24+2*a]	= "0";
+			hv_bin_ts_hdr[24+2*a+1]	= "0";
+			hv_bin_ts_hdr[32+2*a]	= "0";
+			hv_bin_ts_hdr[32+2*a+1]	= "0";
+
+			hv_hdr[14*b]	= "0";
+			hv_hdr[14*b+1]	= "0";
+			hv_hdr[14*b+2]	= "0";
+			hv_hdr[14*b+3]	= "0";
+			hv_hdr[14*b+4]	= "0";
+			hv_hdr[14*b+5]	= "0";
+			hv_hdr[14*b+6]	= "0";
+			hv_hdr[14*b+7]	= "0";
+			hv_hdr[14*b+8]	= "0";
+			hv_hdr[14*b+9]	= "0";
+			hv_hdr[14*b+10] = "0";
+			hv_hdr[14*b+11] = "0";
+			hv_hdr[14*b+12] = "0";
+			hv_hdr[14*b+13] = "0";
+
+			hv_bin_len_hdr[2*b]			= "0";
+			hv_bin_len_hdr[2*b+1]		= "0";
+			hv_bin_len_hdr[8+2*b]		= "0";
+			hv_bin_len_hdr[8+2*b+1]		= "0";
+			hv_bin_len_hdr[16+2*b]		= "0";
+			hv_bin_len_hdr[16+2*b+1]	= "0";
+			hv_bin_len_hdr[24+2*b]		= "0";
+			hv_bin_len_hdr[24+2*b+1]	= "0";
+			hv_bin_len_hdr[32+2*b]		= "0";
+			hv_bin_len_hdr[32+2*b+1]	= "0";
+
+			hv_bin_ts_hdr[2*b]		= "0";
+			hv_bin_ts_hdr[2*b+1]	= "0";
+			hv_bin_ts_hdr[8+2*b]	= "0";
+			hv_bin_ts_hdr[8+2*b+1]	= "0";
+			hv_bin_ts_hdr[16+2*b]	= "0";
+			hv_bin_ts_hdr[16+2*b+1]	= "0";
+			hv_bin_ts_hdr[24+2*b]	= "0";
+			hv_bin_ts_hdr[24+2*b+1]	= "0";
+			hv_bin_ts_hdr[32+2*b]	= "0";
+			hv_bin_ts_hdr[32+2*b+1]	= "0";
+
+			hv_hdr[14*c]	= "0";
+			hv_hdr[14*c+1]	= "0";
+			hv_hdr[14*c+2]	= "0";
+			hv_hdr[14*c+3]	= "0";
+			hv_hdr[14*c+4]	= "0";
+			hv_hdr[14*c+5]	= "0";
+			hv_hdr[14*c+6]	= "0";
+			hv_hdr[14*c+7]	= "0";
+			hv_hdr[14*c+8]	= "0";
+			hv_hdr[14*c+9]	= "0";
+			hv_hdr[14*c+10] = "0";
+			hv_hdr[14*c+11] = "0";
+			hv_hdr[14*c+12] = "0";
+			hv_hdr[14*c+13] = "0";
+
+			hv_bin_len_hdr[2*c]			= "0";
+
+			hv_bin_len_hdr[2*c+1]		= "0";
+			hv_bin_len_hdr[8+2*c]		= "0";
+			hv_bin_len_hdr[8+2*c+1]		= "0";
+			hv_bin_len_hdr[16+2*c]		= "0";
+			hv_bin_len_hdr[16+2*c+1]	= "0";
+			hv_bin_len_hdr[24+2*c]		= "0";
+			hv_bin_len_hdr[24+2*c+1]	= "0";
+			hv_bin_len_hdr[32+2*c]		= "0";
+			hv_bin_len_hdr[32+2*c+1]	= "0";
+
+			hv_bin_ts_hdr[2*c]		= "0";
+			hv_bin_ts_hdr[2*c+1]	= "0";
+			hv_bin_ts_hdr[8+2*c]	= "0";
+			hv_bin_ts_hdr[8+2*c+1]	= "0";
+			hv_bin_ts_hdr[16+2*c]	= "0";
+			hv_bin_ts_hdr[16+2*c+1]	= "0";
+			hv_bin_ts_hdr[24+2*c]	= "0";
+			hv_bin_ts_hdr[24+2*c+1]	= "0";
+			hv_bin_ts_hdr[32+2*c]	= "0";
+			hv_bin_ts_hdr[32+2*c+1]	= "0";
+
+			flow_global_cnt++;
+			cur_samples.push_back(as_sample());
+			reset_regs_dp(d, iter.first);
 		}
 	}
 }
