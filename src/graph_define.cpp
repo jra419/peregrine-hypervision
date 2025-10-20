@@ -1,5 +1,4 @@
 #include "graph_define.hpp"
-#include "dataset.hpp"
 
 using namespace hypervision;
 
@@ -69,7 +68,7 @@ std::string traffic_graph::get_flow_label(std::string ip_src, std::string ip_dst
 	return "0";
 }
 
-auto traffic_graph::get_final_pkt_score(const binary_label_t p_label) ->
+auto traffic_graph::get_final_pkt_score() ->
 		const decltype(p_pkt_score) {
 	if (p_pkt_score != nullptr) {
 		WARN("Previous result overlap.");

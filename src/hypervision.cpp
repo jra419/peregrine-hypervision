@@ -1,3 +1,4 @@
+#include <cstddef>
 #include "fchv.hpp"
 #include "hypervision.hpp"
 #include "pkt_info.hpp"
@@ -115,7 +116,6 @@ void Hypervision::stream_cp() {
 			process_received_pkts();
 			stream_graph();
 			break;
-		// Exception caught.
 		} else if (trace_index == -1) {
 			break;
 		}
@@ -158,14 +158,6 @@ void Hypervision::stream_cp() {
 }
 
 void Hypervision::stream_graph() {
-	#ifdef DEBUG
-		LOGF("Split datasets.");
-	#endif
-	const auto p_dataset_constructor = make_shared<BasicDataset>(parse_result);
-	p_dataset_constructor->configure_via_json(jin_main["dataset_construct"]);
-	p_dataset_constructor->do_dataset_construct();
-	label = p_dataset_constructor->get_label();
-
 	#ifdef DEBUG
 		LOGF("Construct edge.");
 	#endif
@@ -229,7 +221,7 @@ void Hypervision::stream_graph() {
 		LOGF("Graph Detect.");
 	#endif
 	p_graph->graph_detect();
-	p_loss = p_graph->get_final_pkt_score(label);
+	p_loss = p_graph->get_final_pkt_score();
 
 	if (save_result_enable) {
 		do_save_stream(save_result_name, save_result_path);
@@ -702,7 +694,6 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 	try {
 		if (
 			(jin.count("stream_dp") || jin.count("stream_cp")) &&
-			jin.count("dataset_construct") &&
 			jin.count("edge_construct") &&
 			jin.count("graph_analyze") &&
 			jin.count("result_save")) {
@@ -774,6 +765,7 @@ void Hypervision::do_save_stream(const string& save_name, const string& save_pat
 					   + std::to_string(cur_epoch) + "-"
 					   + str_stream
 					   + str_dp_sim
+					   + "timeout-" + std::to_string((int)(flow_timeout))
 					   + str_ts + ".csv";
 
 	ofstream _f(save);

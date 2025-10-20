@@ -3,7 +3,6 @@
 #include "common.hpp"
 #include "edge_define.hpp"
 #include "edge_constructor.hpp"
-#include "dataset.hpp"
 
 #include <mlpack/core.hpp>
 #include <mlpack/methods/kmeans/kmeans.hpp>
@@ -144,7 +143,7 @@ public:
 
 	auto proc_components(const shared_ptr<component> p_com) -> void;
 
-	auto get_final_pkt_score(const binary_label_t p_label) -> const decltype(p_pkt_score);
+	auto get_final_pkt_score() -> const decltype(p_pkt_score);
 
 	void config_via_json(const nlohmann::json & jin);
 };
