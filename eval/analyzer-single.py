@@ -171,7 +171,6 @@ def get_result_from_file(addr: str) -> Tuple[List[int], List[float]]:
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('-c', '--config', type=str, default='configure.json', help='Config path.')
     parser.add_argument('-d', '--dataset', type=str, help='Cur dataset.')
     parser.add_argument('-t', '--target', type=str, help='Cur attack.')
     parser.add_argument('-f', '--file_name', type=str, help='File name.')
@@ -181,19 +180,17 @@ if __name__ == '__main__':
     if not os.path.exists(args.config):
         exit(-1)
 
+    water_line  = 11
+
     with open(args.config, 'r') as f:
         configd = json.load(f)
         for k,v in configd.items():
             if args.dataset in k:
                 if args.target in v:
-                    water_line  = v[args.target]
                     dataset     = args.dataset
                     class_name  = k
                     target      = args.target
                     file_name   = args.file_name
                     break
-
-    if 'water_line' not in locals():
-        exit(-1)
 
     analyze_result(*get_result_from_file(f"data/{args.dataset}/{args.target}/{args.file_name}"))
