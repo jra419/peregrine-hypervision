@@ -79,7 +79,7 @@ void Hypervision::stream_cp() {
 	trace		= jin_main["stream_cp"]["trace"];
 	hv_dataset	= jin_main["stream_cp"]["hv_dataset"];
 
-	FCHv fc(trace, hv_dataset, flow_timeout, dp_sim);
+	FCHv fc(trace, hv_dataset, flow_timeout, sampl_rate, dp_sim);
 
 	size_t trace_size = fc.trace_size();
 
@@ -721,6 +721,9 @@ void Hypervision::config_via_json(const nlohmann::json& jin) {
 				if (j_stream.count("epoch_cntr")) {
 					epoch_cntr = static_cast<decltype(epoch_cntr)>(j_stream["epoch_cntr"]);
 				}
+				if (j_stream.count("sampl_rate")) {
+					sampl_rate = static_cast<decltype(sampl_rate)>(j_stream["sampl_rate"]);
+				}
 				if (j_stream.count("flow_timeout")) {
 					flow_timeout = static_cast<decltype(flow_timeout)>(j_stream["flow_timeout"]);
 				}
@@ -766,6 +769,7 @@ void Hypervision::do_save_stream(const string& save_name, const string& save_pat
 					   + str_stream
 					   + str_dp_sim
 					   + "timeout-" + std::to_string((int)(flow_timeout))
+					   + "-sampl-" + std::to_string(sampl_rate)
 					   + str_ts + ".csv";
 
 	ofstream _f(save);

@@ -24,7 +24,8 @@
 
 class FCHv {
 public:
-	FCHv(const std::string& file_path, bool hv_dataset, double flow_timeout, bool dp_sim);
+	FCHv(const std::string& file_path, bool hv_dataset, double flow_timeout,
+		 int sampl_rate, bool dp_sim);
 
 	std::unordered_map<std::string, std::string> cur_pkt;
 
@@ -48,6 +49,8 @@ public:
 private:
 	std::string	file_path;
 	bool		hv_dataset;
+	int			sampl_rate;
+	int			sampl_idx = 0;
 	bool		dp_sim;
 	bool		timeout_toggle;
 	bool		timeout_toggle_a, timeout_toggle_b, timeout_toggle_c, timeout_toggle_d;

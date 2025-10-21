@@ -22,8 +22,9 @@
 
 #include "fchv.hpp"
 
-FCHv::FCHv(const std::string& file_path, bool hv_dataset, double flow_timeout, bool dp_sim)
-			: file_path(file_path), hv_dataset(hv_dataset), dp_sim(dp_sim),
+FCHv::FCHv(const std::string& file_path, bool hv_dataset, double flow_timeout,
+		   int sampl_rate, bool dp_sim):
+			file_path(file_path), hv_dataset(hv_dataset), sampl_rate(sampl_rate), dp_sim(dp_sim),
 			timeout_toggle_a(false), timeout_toggle_b(false), timeout_toggle_c(false),
 			timeout_toggle_d(false), timeout(flow_timeout), cur_idx(0), read_idx(0), hash_dp(0), hash_cp(""), flow_global_cnt(0), test_ts_interval(0), test_ts_interval_last(0) {
 	hv_hdr.fill("");
@@ -294,6 +295,10 @@ int FCHv::process_dp() {
 		return -1;
 	}
 
+	if (sampl_idx < sampl_rate) {
+		sampl_idx++;
+	}
+
 	hv_hdr.fill("");
 	hv_bin_len_hdr.fill("");
 	hv_bin_ts_hdr.fill("");
@@ -303,10 +308,13 @@ int FCHv::process_dp() {
 	timeout_toggle_d = false;
 
 	// Update the current index counter value.
-	if (read_idx < 65536) {
-		read_idx++;
-	} else {
-		read_idx = 0;
+	if (sampl_idx == sampl_rate) {
+		// if (read_idx < 65536) {
+		if (read_idx < 131072) {
+			read_idx++;
+		} else {
+			read_idx = 0;
+		}
 	}
 
 	// Hash calculation.
@@ -341,14 +349,17 @@ int FCHv::process_dp() {
 
 	std::string hash_bin = std::bitset<32>(hash_tmp).to_string();
 
-	hash_dp = std::stol(hash_bin.substr(14), nullptr, 2);
+	hash_dp = std::stol(hash_bin.substr(13), nullptr, 2);
 
 	// Read/Update the various registers based on the hash value.
-	if (hash_dp < 65536) {
+	// if (hash_dp < 65536) {
+	if (hash_dp < 131072) {
 		reg_update_dp(0, 1, 2, 3);
-	} else if (hash_dp < 131072) {
+	// } else if (hash_dp < 131072) {
+	} else if (hash_dp < 262144) {
 		reg_update_dp(1, 0, 2, 3);
-	} else if (hash_dp < 196602) {
+	// } else if (hash_dp < 196602) {
+	} else if (hash_dp < 393216) {
 		reg_update_dp(2, 0, 1, 3);
 	} else {
 		reg_update_dp(3, 0, 1, 2);
@@ -356,11 +367,14 @@ int FCHv::process_dp() {
 
 	if (timeout_toggle_a == true || timeout_toggle_b == true
 			|| timeout_toggle_c == true || timeout_toggle_d == true) {
-		cur_samples.push_back(as_sample());
 		timeout_toggle_a = false;
 		timeout_toggle_b = false;
 		timeout_toggle_c = false;
 		timeout_toggle_d = false;
+
+		cur_samples.push_back(as_sample());
+		sampl_idx = 0;
+
 		return 0;
 	} else {
 		return -1;
@@ -371,6 +385,10 @@ int FCHv::process_cp() {
 	// If the packet is not IPv4.
 	if (cur_pkt.empty()) {
 		return -1;
+	}
+
+	if (sampl_idx < sampl_rate) {
+		sampl_idx++;
 	}
 
 	hv_hdr.fill("");
@@ -387,11 +405,14 @@ int FCHv::process_cp() {
 	reg_update_cp(0);
 
 	if ((std::stod(cur_pkt["ts"]) - test_ts_interval_last - 5.0) > EPS) {
-		reg_read_cp(0, 1, 2, 3);
-		test_ts_interval_last = std::stod(cur_pkt["ts"]);
+		if (sampl_idx % sampl_rate == 0) {
+			reg_read_cp(0, 1, 2, 3);
+			test_ts_interval_last = std::stod(cur_pkt["ts"]);
+		}
 	}
 
 	if (timeout_toggle == true) {
+		sampl_idx = 0;
 		return 0;
 	} else {
 		return -1;
@@ -411,7 +432,7 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 			&& (reg_ts_dp[a][hash_mod][0] != 0 && reg_ts_dp[a][hash_mod][1] != 0)) {
 		double ts_interval_a = std::stod(cur_pkt["ts"]) - reg_ts_dp[a][hash_mod][1];
 
-		if ((ts_interval_a - timeout) > EPS) {
+		if (((ts_interval_a - timeout) > EPS) && (sampl_idx == sampl_rate)) {
 			timeout_toggle_a = true;
 
 			hv_hdr[14*a]	= std::to_string(static_cast<double>(reg_ts_dp[a][hash_mod][0]));
@@ -678,7 +699,7 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[b][read_idx][0] != 0 && reg_ts_dp[b][read_idx][1] != 0) {
 			double ts_interval_b = std::stod(cur_pkt["ts"]) - reg_ts_dp[b][read_idx][1];
 
-			if ((ts_interval_b - timeout) > EPS) {
+			if (((ts_interval_b - timeout) > EPS) && (sampl_idx == sampl_rate)) {
 				timeout_toggle_b = true;
 
 				hv_hdr[14*b]	= std::to_string(static_cast<double>(reg_ts_dp[b][read_idx][0]));
@@ -771,7 +792,7 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[c][read_idx][0] != 0 && reg_ts_dp[c][read_idx][1] != 0) {
 			double ts_interval_c = std::stod(cur_pkt["ts"]) - reg_ts_dp[c][read_idx][1];
 
-			if ((ts_interval_c - timeout) > EPS) {
+			if (((ts_interval_c - timeout) > EPS) && (sampl_idx == sampl_rate)) {
 				timeout_toggle_c = true;
 
 				hv_hdr[14*c]	= std::to_string(static_cast<double>(reg_ts_dp[c][read_idx][0]));
@@ -864,7 +885,7 @@ void FCHv::reg_update_dp(int a, int b, int c, int d) {
 		if (reg_ts_dp[d][read_idx][0] != 0 && reg_ts_dp[d][read_idx][1] != 0) {
 			double ts_interval_d = std::stod(cur_pkt["ts"]) - reg_ts_dp[d][read_idx][1];
 
-			if ((ts_interval_d - timeout) > EPS) {
+			if (((ts_interval_d - timeout) > EPS) && (sampl_idx == sampl_rate)) {
 				timeout_toggle_d = true;
 
 				hv_hdr[14*d]	= std::to_string(static_cast<double>(reg_ts_dp[d][read_idx][0]));

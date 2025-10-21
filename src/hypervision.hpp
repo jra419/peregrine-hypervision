@@ -23,7 +23,7 @@ namespace hypervision {
 class Hypervision {
 
 private:
-	nlohmann::json jin_main;
+	nlohmann::json			jin_main;
 	string file_path		= "";
 	string interface		= "";
 	string trace			= "";
@@ -32,6 +32,7 @@ private:
 	bool dp_sim				= false;
 	bool is_stream_cp		= false;
 	int epoch_cntr			= 0;
+	int sampl_rate			= 0;
 	double flow_timeout		= 0.0;
 	int cur_cntr			= 0;
 	int cur_epoch			= 0;
