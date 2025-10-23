@@ -1,6 +1,5 @@
 .cache/
 build/
-cmake/
 
 eval/data
 eval/figure

@@ -28,12 +28,14 @@ def roc_action(label: List[int], score: List[float]) -> void:
 
     if not os.path.exists('./figure/'):
         os.mkdir('./figure/')
-    if not os.path.exists(f'./figure/{class_name}'):
-        os.mkdir(f'./figure/{class_name}/')
-    if not os.path.exists(f'./figure/{class_name}/{target}'):
-        os.mkdir(f'./figure/{class_name}/{target}')
+    if not os.path.exists(f'./figure/{args.dataset}'):
+        os.mkdir(f'./figure/{args.dataset}/')
+    if not os.path.exists(f'./figure/{args.dataset}/{args.target_class}'):
+        os.mkdir(f'./figure/{args.dataset}/{args.target_class}/')
+    if not os.path.exists(f'./figure/{args.dataset}/{args.target_class}/{args.target}'):
+        os.mkdir(f'./figure/{args.dataset}/{args.target_class}/{args.target}')
 
-    plt.savefig(f'./figure/{class_name}/{target}/{file_name}-auc-roc.png')
+    plt.savefig(f'./figure/{args.dataset}/{args.target_class}/{args.target}/{args.file_name}-auc-roc.png')
 
     deta        = 1
     deta_fpr    = 1
@@ -59,7 +61,7 @@ def roc_action(label: List[int], score: List[float]) -> void:
             deta_tpr = d
             r_fpr = a
 
-    print(f"[{class_name}-{args.target}]")
+    print(f"[{args.dataset}-{args.target_class}-{args.target}]")
     print(f"TPR     = {r_tpr:7.6f} (FPR=0.1)")
     print(f"FPR     = {r_fpr:7.6f} (TPR=0.9)")
     print(f"AU-ROC  = {roc_auc:7.6f}")
@@ -67,13 +69,15 @@ def roc_action(label: List[int], score: List[float]) -> void:
 
     if not os.path.exists('./metrics/'):
         os.mkdir('./metrics/')
-    if not os.path.exists(f'./metrics/{class_name}'):
-        os.mkdir(f'./metrics/{class_name}/')
-    if not os.path.exists(f'./metrics/{class_name}/{target}'):
-        os.mkdir(f'./metrics/{class_name}/{target}')
+    if not os.path.exists(f'./metrics/{args.dataset}'):
+        os.mkdir(f'./metrics/{args.dataset}/')
+    if not os.path.exists(f'./metrics/{args.dataset}/{args.target_class}'):
+        os.mkdir(f'./metrics/{args.dataset}/{args.target_class}/')
+    if not os.path.exists(f'./metrics/{args.dataset}/{args.target_class}/{args.target}'):
+        os.mkdir(f'./metrics/{args.dataset}/{args.target_class}/{args.target}')
 
-    f = open(f'./metrics/{class_name}/{target}/{file_name}-roc.txt', 'a+')
-    f.write(f'[{class_name}-{target}]\n')
+    f = open(f'./metrics/{args.dataset}/{args.target_class}/{args.target}/{args.file_name}-roc.txt', 'a+')
+    f.write(f'[{args.dataset}-{args.target_class}-{args.target}]\n')
     f.write(f'TPR     = {r_tpr:7.6f} (FPR=0.1)\n')
     f.write(f'FPR     = {r_fpr:7.6f} (TPR=0.9)\n')
     f.write(f'AU-ROC  = {roc_auc:7.6f}\n')
@@ -105,12 +109,14 @@ def f_action(label: List[int], score: List[float]) -> void:
 
     if not os.path.exists('./figure/'):
         os.mkdir('./figure/')
-    if not os.path.exists(f'./figure/{class_name}'):
-        os.mkdir(f'./figure/{class_name}/')
-    if not os.path.exists(f'./figure/{class_name}/{target}'):
-        os.mkdir(f'./figure/{class_name}/{target}')
+    if not os.path.exists(f'./figure/{args.dataset}'):
+        os.mkdir(f'./figure/{args.dataset}/')
+    if not os.path.exists(f'./figure/{args.dataset}/{args.target_class}'):
+        os.mkdir(f'./figure/{args.dataset}/{args.target_class}/')
+    if not os.path.exists(f'./figure/{args.dataset}/{args.target_class}/{args.target}'):
+        os.mkdir(f'./figure/{args.dataset}/{args.target_class}/{args.target}')
 
-    plt.savefig(f'./figure/{class_name}/{target}/{file_name}-auc-prc.png')
+    plt.savefig(f'./figure/{args.dataset}/{args.target_class}/{args.target}/{args.file_name}-auc-prc.png')
 
     print(f'F1-score    = {f1:7.6f}')
     print(f'F2-score    = {f2:7.6f}')
@@ -135,13 +141,15 @@ def f_action(label: List[int], score: List[float]) -> void:
 
     if not os.path.exists('./metrics/'):
         os.mkdir('./metrics/')
-    if not os.path.exists(f'./metrics/{class_name}'):
-        os.mkdir(f'./metrics/{class_name}/')
-    if not os.path.exists(f'./metrics/{class_name}/{target}'):
-        os.mkdir(f'./metrics/{class_name}/{target}')
+    if not os.path.exists(f'./metrics/{args.dataset}'):
+        os.mkdir(f'./metrics/{args.dataset}/')
+    if not os.path.exists(f'./metrics/{args.dataset}/{args.target_class}'):
+        os.mkdir(f'./metrics/{args.dataset}/{args.target_class}/')
+    if not os.path.exists(f'./metrics/{args.dataset}/{args.target_class}/{args.target}'):
+        os.mkdir(f'./metrics/{args.dataset}/{args.target_class}/{args.target}')
 
-    f = open(f'./metrics/{class_name}/{target}/{file_name}-prc.txt', 'a+')
-    f.write(f'[{dataset}-{target}]\n')
+    f = open(f'./metrics/{args.dataset}/{args.target_class}/{args.target}/{args.file_name}-prc.txt', 'a+')
+    f.write(f'[{args.dataset}-{args.target_class}-{args.target}]\n')
     f.write(f'F1-score  = {f1:7.6f}\n')
     f.write(f'F2-score  = {f2:7.6f}\n')
     f.write(f'Precision = {pre:7.6f}\n')
@@ -163,34 +171,28 @@ def get_result_from_file(addr: str) -> Tuple[List[int], List[float]]:
     score       = []
 
     df = pd.read_csv(f'{addr}.csv')
-    label.extend(df['label'].tolist())
-    score.extend(df['loss'].tolist())
+    if args.input_pkt:
+        label.extend(df['label'].tolist())
+        score.extend(df['loss'].tolist())
+        print(f'Trace size: {len(label)}')
+    else:
+        df_expanded = df.loc[df.index.repeat(df['cnt'])].reset_index(drop=True)
+        label.extend(df_expanded['label'].tolist())
+        score.extend(df_expanded['loss'].tolist())
+        print(f'Trace size: {len(label)}')
 
-    print(f'Trace size: {len(label)}')
     return label, score
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('-d', '--dataset', type=str, help='Cur dataset.')
+    parser.add_argument('-c', '--target_class', type=str, help='Cur class.')
     parser.add_argument('-t', '--target', type=str, help='Cur attack.')
     parser.add_argument('-f', '--file_name', type=str, help='File name.')
+    parser.add_argument('--input_pkt', default=False, action=argparse.BooleanOptionalAction)
 
     args = parser.parse_args()
 
-    if not os.path.exists(args.config):
-        exit(-1)
-
     water_line  = 11
 
-    with open(args.config, 'r') as f:
-        configd = json.load(f)
-        for k,v in configd.items():
-            if args.dataset in k:
-                if args.target in v:
-                    dataset     = args.dataset
-                    class_name  = k
-                    target      = args.target
-                    file_name   = args.file_name
-                    break
-
-    analyze_result(*get_result_from_file(f"data/{args.dataset}/{args.target}/{args.file_name}"))
+    analyze_result(*get_result_from_file(f"data/{args.dataset}/{args.target_class}/{args.target}/{args.file_name}"))
