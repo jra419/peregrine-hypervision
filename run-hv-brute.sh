@@ -64,6 +64,11 @@ sudo -E ./build/debug/hypervision conf/hypervision/brute/riprdos-64.json cp | te
 sudo -E ./build/debug/hypervision conf/hypervision/brute/riprdos-256.json cp | tee "eval/logs/hypervision/brute/riprdos/riprdos-256-$DATETIME.log"
 sudo -E ./build/debug/hypervision conf/hypervision/brute/riprdos-1024.json cp | tee "eval/logs/hypervision/brute/riprdos/riprdos-1024-$DATETIME.log"
 
+sudo -E ./build/debug/hypervision conf/hypervision/brute/rstsdos-1.json cp | tee "eval/logs/hypervision/brute/rstsdos/rstsdos-1-$DATETIME.log"
+sudo -E ./build/debug/hypervision conf/hypervision/brute/rstsdos-64.json cp | tee "eval/logs/hypervision/brute/rstsdos/rstsdos-64-$DATETIME.log"
+sudo -E ./build/debug/hypervision conf/hypervision/brute/rstsdos-256.json cp | tee "eval/logs/hypervision/brute/rstsdos/rstsdos-256-$DATETIME.log"
+sudo -E ./build/debug/hypervision conf/hypervision/brute/rstsdos-1024.json cp | tee "eval/logs/hypervision/brute/rstsdos/rstsdos-1024-$DATETIME.log"
+
 sudo -E ./build/debug/hypervision conf/hypervision/brute/sqlscan-1.json cp | tee "eval/logs/hypervision/brute/sqlscan/sqlscan-1-$DATETIME.log"
 sudo -E ./build/debug/hypervision conf/hypervision/brute/sqlscan-64.json cp | tee "eval/logs/hypervision/brute/sqlscan/sqlscan-64-$DATETIME.log"
 sudo -E ./build/debug/hypervision conf/hypervision/brute/sqlscan-256.json cp | tee "eval/logs/hypervision/brute/sqlscan/sqlscan-256-$DATETIME.log"
