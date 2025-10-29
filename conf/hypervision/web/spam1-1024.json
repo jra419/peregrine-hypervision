@@ -1,6 +1,6 @@
 {
 	"stream_cp": {
-		"trace": "/home/docker/datasets/hypervision/misc/spam1/spam1.csv",
+		"trace": "/home/docker/datasets/hypervision/web/spam1/spam1.csv",
 		"attack": "spam1",
 		"dataset": "hypervision",
 		"dp_sim": true,
@@ -40,6 +40,6 @@
 	"result_save": {
 		"save_result_enable": true,
 		"save_result_name": "spam1",
-		"save_result_path": "eval/data/hypervision/misc/spam1"
+		"save_result_path": "eval/data/hypervision/web/spam1"
 	}
 }
