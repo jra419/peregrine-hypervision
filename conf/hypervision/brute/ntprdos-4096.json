@@ -6,7 +6,7 @@
 		"dp_sim": true,
 		"hv_dataset": true,
 		"epoch_cntr": 100000000,
-		"sampl_rate": 409,
+		"sampl_rate": 4096,
 		"flow_timeout": 5.0
 	},
 	"edge_construct": {
