@@ -163,7 +163,7 @@ def f_action(label: List[int], score: List[float]) -> void:
 
 def analyze_result(label: List[int], score: List[float]) -> bool:
     roc_action(label, score)
-    f_action(label, score)
+    # f_action(label, score)
     return True
 
 def get_result_from_file(addr: str) -> Tuple[List[int], List[float]]:
