@@ -60,8 +60,8 @@ for i in $(seq $COUNT); do
 	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdmd-64.json cp | tee "eval/logs/hypervision/misc/telnetpwdmd/telnetpwdmd-64-$DATETIME.log"
 	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdmd-256.json cp | tee "eval/logs/hypervision/misc/telnetpwdmd/telnetpwdmd-256-$DATETIME.log"
 	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdmd-1024.json cp | tee "eval/logs/hypervision/misc/telnetpwdmd/telnetpwdmd-1024-$DATETIME.log"
-	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdla-2048.json cp | tee "eval/logs/hypervision/misc/telnetpwdla/telnetpwdla-2048-$DATETIME.log"
-	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdla-4096.json cp | tee "eval/logs/hypervision/misc/telnetpwdla/telnetpwdla-4096-$DATETIME.log"
+	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdmd-2048.json cp | tee "eval/logs/hypervision/misc/telnetpwdmd/telnetpwdmd-2048-$DATETIME.log"
+	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdmd-4096.json cp | tee "eval/logs/hypervision/misc/telnetpwdmd/telnetpwdmd-4096-$DATETIME.log"
 
 	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdsm-1.json cp | tee "eval/logs/hypervision/misc/telnetpwdsm/telnetpwdsm-1-$DATETIME.log"
 	sudo -E ./build/debug/hypervision conf/hypervision/misc/telnetpwdsm-64.json cp | tee "eval/logs/hypervision/misc/telnetpwdsm/telnetpwdsm-64-$DATETIME.log"
