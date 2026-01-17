@@ -345,11 +345,24 @@ struct sample_t {
 			 std::array<std::string, 40> hv_bin_len_hdr,
 			 std::array<std::string, 40> hv_bin_ts_hdr) {
 
+		unsigned int o1 = 0, o2 = 0, o3 = 0, o4 = 0;
+		char c1 = 0, c2 = 0, c3 = 0;
+
 		ts_start_0	= std::stod(hv_hdr[0]);
 		ts_end_0	= std::stod(hv_hdr[1]);
 		ts_agg_0	= std::stod(hv_hdr[2]);
-		ip_src_0	= ntohl(std::stoul(hv_hdr[3]));
-		ip_dst_0	= ntohl(std::stoul(hv_hdr[4]));
+		// ip_src_0	= ntohl(std::stoul(hv_hdr[3]));
+		std::sscanf(hv_hdr[3].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_src_0 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
+		// ip_dst_0	= ntohl(std::stoul(hv_hdr[4]));
+		std::sscanf(hv_hdr[4].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_dst_0 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
 		proto_0		= std::stoi(hv_hdr[5]);
 		ports_0		= std::stol(hv_hdr[6]);
 		syn_0		= std::stoi(hv_hdr[7]);
@@ -363,8 +376,18 @@ struct sample_t {
 		ts_start_1	= std::stod(hv_hdr[14]);
 		ts_end_1	= std::stod(hv_hdr[15]);
 		ts_agg_1	= std::stod(hv_hdr[16]);
-		ip_src_1	= ntohl(std::stoul(hv_hdr[17]));
-		ip_dst_1	= ntohl(std::stoul(hv_hdr[18]));
+		// ip_src_1	= ntohl(std::stoul(hv_hdr[17]));
+		std::sscanf(hv_hdr[17].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_src_1 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
+		// ip_dst_1	= ntohl(std::stoul(hv_hdr[18]));
+		std::sscanf(hv_hdr[18].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_dst_1 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
 		proto_1		= std::stoi(hv_hdr[19]);
 		ports_1		= std::stol(hv_hdr[20]);
 		syn_1		= std::stoi(hv_hdr[21]);
@@ -378,8 +401,18 @@ struct sample_t {
 		ts_start_2	= std::stod(hv_hdr[28]);
 		ts_end_2	= std::stod(hv_hdr[29]);
 		ts_agg_2	= std::stod(hv_hdr[30]);
-		ip_src_2	= ntohl(std::stoul(hv_hdr[31]));
-		ip_dst_2	= ntohl(std::stoul(hv_hdr[32]));
+		// ip_src_2	= ntohl(std::stoul(hv_hdr[31]));
+		std::sscanf(hv_hdr[31].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_src_2 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
+		// ip_dst_2	= ntohl(std::stoul(hv_hdr[32]));
+		std::sscanf(hv_hdr[32].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_dst_2 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
 		proto_2		= std::stoi(hv_hdr[33]);
 		ports_2		= std::stol(hv_hdr[34]);
 		syn_2		= std::stoi(hv_hdr[35]);
@@ -393,8 +426,18 @@ struct sample_t {
 		ts_start_3	= std::stod(hv_hdr[42]);
 		ts_end_3	= std::stod(hv_hdr[43]);
 		ts_agg_3	= std::stod(hv_hdr[44]);
-		ip_src_3	= ntohl(std::stoul(hv_hdr[45]));
-		ip_dst_3	= ntohl(std::stoul(hv_hdr[46]));
+		// ip_src_3	= ntohl(std::stoul(hv_hdr[45]));
+		std::sscanf(hv_hdr[45].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_src_3 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
+		// ip_dst_3	= ntohl(std::stoul(hv_hdr[46]));
+		std::sscanf(hv_hdr[46].c_str(), "%u%c%u%c%u%c%u", &o1, &c1, &o2, &c2, &o3, &c3, &o4);
+		ip_dst_3 = (static_cast<unsigned long>(o1) << 24)
+                 | (static_cast<unsigned long>(o2) << 16)
+                 | (static_cast<unsigned long>(o3) <<  8)
+                 |  static_cast<unsigned long>(o4);
 		proto_3		= std::stoi(hv_hdr[47]);
 		ports_3		= std::stol(hv_hdr[48]);
 		syn_3		= std::stoi(hv_hdr[49]);
