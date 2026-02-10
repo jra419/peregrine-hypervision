@@ -8,3 +8,5 @@ eval/logs
 eval/__pycache__
 
 compile_commands.json
+
+run*.sh
